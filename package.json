@@ -2,7 +2,7 @@
   "name": "vuex-model-store-generator",
   "version": "0.1.0",
   "description": "generator of models and store default for vuex",
-  "main": "lib/index.js",
+  "main": "src/Model.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
