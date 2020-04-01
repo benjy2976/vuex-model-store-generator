@@ -1,0 +1,30 @@
+{
+  "name": "vuex-model-store-generator",
+  "version": "0.1.0",
+  "description": "generator of models and store default for vuex",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjy2976/vuex-model-store-generator.git"
+  },
+  "keywords": [
+    "vuex",
+    "generator",
+    "model",
+    "store"
+  ],
+  "author": "Walther Raul II Benjamin Aguirre Tello",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/benjy2976/vuex-model-store-generator/issues"
+  },
+  "homepage": "https://github.com/benjy2976/vuex-model-store-generator#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "pure-md5": "^0.1.9",
+    "vuex": "^3.1.3"
+  }
+}
