@@ -5,17 +5,18 @@ export default class Model {
 
   constructor(config) {
     let defaultValues = {
-      alias     : null,
-      route     : null,
-      hash      : false,
-      store     : false,
-      methods   : null, //config for storeDefault
-      singular  : null,
-      plural    : null,
-      key       : 'id',
-      name      : 'name',
-      selectable: false,
-      default   : {}
+      alias     : null,//alias utilizado para almacenar en el localstorage
+      route     : null,//ruta donde se encuentra el resource
+      hash      : false,//la condicional si se va a validar el md5
+      store     : false,//la condicional que define si se guardara en el localstorage
+      methods   : null, //define los metodos adicionales utilizador por el modelo
+      /*config for storeDefault*/
+      singular  : null,//alias para referirse al objeto de manera singular
+      plural    : null,//alias para referirse al objeto de manera plural
+      key       : 'id',//define el primary key que se usara para acceder al objeto
+      name      : 'name',//nombre del atriburo name en la base de datos
+      selectable: false,//condicional para definir si el objeto es seleccionable
+      default   : {}//valor del objeto por defecto
     }
     defaultValues     = Object.assign(defaultValues, config)
     this.alias        = defaultValues.alias
