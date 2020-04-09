@@ -150,7 +150,7 @@ export default class StoreDefault {
     //mutacion para actualizar un objeto de la lista de objetos
     this.mutations['update' + config.singularCapital] = (state, data) => {
       let index = state[state.plural].findIndex(d => d[state.key] === data[state.key])
-      state[state.singular][index]=Object.assign(state[state.singular][index], data)
+      state[state.plural][index]=Object.assign(state[state.plural][index], data)
       //Vue.set(state[state.plural], index, data)
     }
     if (model.isSelectable()) {
