@@ -1,5 +1,5 @@
-import {md5}         from 'pure-md5'
-import StoreDefault  from "./StoreDefault"
+import {md5}        from 'pure-md5'
+import StoreDefault from "./StoreDefault"
 
 export default class Model {
 
@@ -9,14 +9,15 @@ export default class Model {
       route     : null,//ruta donde se encuentra el resource
       hash      : false,//la condicional si se va a validar el md5
       store     : false,//la condicional que define si se guardara en el localstorage
-      methods   : null, //define los metodos adicionales utilizador por el modelo
+      methods   : null, //define los métodos adicionales utilizados por el modelo
       /*config for storeDefault*/
       singular  : null,//alias para referirse al objeto de manera singular
       plural    : null,//alias para referirse al objeto de manera plural
       key       : 'id',//define el primary key que se usara para acceder al objeto
-      name      : 'name',//nombre del atriburo name en la base de datos
+      name      : 'name',//nombre del atributo name en la base de datos
       selectable: false,//condicional para definir si el objeto es seleccionable
-      default   : {}//valor del objeto por defecto
+      default   : {},//valor del objeto por defecto,
+      params    : {modeljs: true}//aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
     }
     defaultValues     = Object.assign(defaultValues, config)
     this.alias        = defaultValues.alias
@@ -32,33 +33,41 @@ export default class Model {
     this.name       = defaultValues.name
     this.selectable = defaultValues.selectable
     this.default    = defaultValues.default
+    this.params     = defaultValues.params
   }
 
   //funcion para obtener el listado de Objetos de la base de datos
   getAll(params = null) {
+    params = Object.assign(params, this.params)
     return axios.get(this.route, {
       params: params,
     })
   }
 
-  //funcion para creat un objeto en la base de datos
+  //funcion para crear un objeto en la base de datos
   create(d) {
+    d = Object.assign(d, this.params)
     return axios.post(this.route, d)
   }
 
   //funcion para mostrar un objeto de la base de datos
   show(id) {
-    return axios.get(this.route + '/' + id)
+    return axios.get(this.route + '/' + d[this.key], {
+      params: this.params,
+    })
   }
 
   //funcion para actualizar un objeto en la base de datos
   update(d) {
+    d = Object.assign(d, this.params)
     return axios.put(this.route + '/' + d[this.key], d)
   }
 
   //funcion para eliminar un objeto de la base de datos
   delete(d) {
-    return axios.delete(this.route + '/' + d[this.key])
+    return axios.delete(this.route + '/' + d[this.key], {
+      params: this.params,
+    })
   }
 
   //funcion para verificar si la lista esta guardada en el local storage
@@ -76,7 +85,7 @@ export default class Model {
     }
   }
 
-  //funcion para obtener lo almacenado en el localsotrage
+  //funcion para obtener lo almacenado en el localStorage
   getStored() {
     return JSON.parse(localStorage.getItem(this.alias))
   }
@@ -101,7 +110,7 @@ export default class Model {
     return new StoreDefault(this, state, getters, actions, mutations)
   }
 
-  //getter para obtener todos los parametros de configuracion de el modelo
+  //getter para obtener todos los parámetros de configuración de el modelo
   getConfig() {
     return {
       alias     : this.alias,
@@ -118,7 +127,7 @@ export default class Model {
     }
   }
 
-  //funcion para obtener los parametros de configuracion necesarios para el StoreDefault
+  //funcion para obtener los parámetros de configuración necesarios para el StoreDefault
   getConfigForStore() {
     return {
       singular: this.singular,
@@ -132,7 +141,7 @@ export default class Model {
     return this.selectable
   }
 
-  //getter para obtener el valor ppor default de el objeto
+  //getter para obtener el valor por default de el objeto
   getDefault() {
     return this.default
   }
