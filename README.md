@@ -122,7 +122,7 @@ setProductSelected(product)
 export default Product.getStore(state, getters, actions, mutations)
 
 ```
-after you need to create a file index.js into a /store folder you have two ways to declare the state
+you need to create a file index.js into a /store folder you have two ways to declare the state
 
 ````js
 import Vue        from 'vue'
@@ -141,7 +141,7 @@ export default new Vuex.Store({
                                 strict : debug,
                               })
 ````
-
+in your app.js you can invoque like this
 ````js
 
 window.axios = require('axios')
