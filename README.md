@@ -1,7 +1,9 @@
 # vuex-model-store-generator
-This is a powerful package to consume data from webservices and use it as a model, centralizing the control of routes and making the call to data from the server much more friendly.
+This is a powerful package to consume data from webservices and use it as a model, centralizing the control of routes and
+ making the call to data from the server much more friendly.
 
-este es un paquete potente para consumir datos de webservices y utilizarlo como modelo, centralizado el control de las rutas y haciendo mucha mas amable la llamada a los datos desde el servidor
+este es un paquete potente para consumir datos de webservices y utilizarlo como modelo, centralizado el control de las 
+rutas y haciendo mucha mas amable la llamada a los datos desde el servidor
 
 It also provides a tool that creates a template with the main actions for state control with Vuex.
 
@@ -17,7 +19,9 @@ $ npm install vuex-model-store-generator
 
 
 ## Example
-#### NOTE: if you use a md5 validation and the store functionality you can download the resource from the server once, an re download only if the data was changed
+NOTE: if you use a md5 validation and the store functionality you can download the resource from the server once,
+an re download only if the data was changed.
+
 you can create a models.js file and put the next code
 
 ```js
@@ -95,11 +99,15 @@ const actions = {
 //here you can redefine, or define new actions
 //by default its going to create the next actions
 /*
-getProducts(params)//this action invoque at the getAll(params) from the model an store the response into a state.products list
+getProducts(params)//this action invoque at the getAll(params) from the model an store the response into a state.products 
+//list
 afterGetProducts()//this action is called after the getProducts is dispatched, you yo can redefine it if you need
-createProduct(product)//this action create a new producto, call to the create(product) from the model and add the response at the state.products list
-updateProduct(product)//this action update a new producto, call to the update(product) from the model and add the response at the state.products list
-deleteProduct(product)//this action delete a new producto, call to the delete(product) from the model and add the response at the state.products list
+createProduct(product)//this action create a new producto, call to the create(product) from the model and add the response 
+//at the state.products list
+updateProduct(product)//this action update a new producto, call to the update(product) from the model and add the response 
+//at the state.products list
+deleteProduct(product)//this action delete a new producto, call to the delete(product) from the model and add the response 
+//at the state.products list
 selectProduct(product)//this actions select one product from the list of products an put tha value into a state.product
 afterSelectProduct()//this action is called after the selectProduct is dispatched, you yo can redefine it if you need
 */
