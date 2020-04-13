@@ -36,12 +36,12 @@ const configProducts     = {
 
     /*config for storeDefault*/
     singular  : 'product',//alias para referirse al objeto de manera singular
-    plural    : 'productS', //alias para referirse al objeto de manera plural
+    plural    : 'products', //alias para referirse al objeto de manera plural
     key       : 'id',//define el primary key que se usara para acceder al objeto
     name      : 'name',//nombre del atributo name en la base de datos
     selectable: false,//condicional para definir si el objeto es seleccionable
     default   : {},//valor del objeto por defecto,
-    params    : {modeljs: true}//aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
+    params    : {modeljs: true}//aquí se configuran parámetros adicionales a enviar en los request
    
 }
 
@@ -54,7 +54,7 @@ so where ever you are you can call the product Model
 import Producto from './models.js'
 
 Producto.show(1)
-//this code create a request to the server an return a request to the objet whit the id Nr 1
+//this code create a request to the server an return a request to the object with the id Nr 1
 ```
 
 if you are using Vuex you can create the storeDefault
@@ -69,7 +69,7 @@ import {Product} from '../../models'
 
 
 const state = {
-//here you can redefine, or define new states
+//here you can redefine or define new states
 //by default its going to create the next stores
 /*
 key:"id"
@@ -84,7 +84,7 @@ singularCapital:"Product"
 }
 
 const getters = {
-//here you can redefine, or define new getters
+//here you can redefine or define new getters
 //by default its going to create the next getters
 /*
 productName(id)// getter used to access at the name of the product whit the id
@@ -96,7 +96,7 @@ selectedProduct()// getter used to access at te producto selected (only if is se
 }
 
 const actions = {
-//here you can redefine, or define new actions
+//here you can redefine or define new actions
 //by default its going to create the next actions
 /*
 getProducts(params)//this action invoque at the getAll(params) from the model an store the response into a state.products 
@@ -117,8 +117,8 @@ afterSelectProduct()//this action is called after the selectProduct is dispatche
 
 const mutations = {
 
-//here you can redefine, or define new mutations
-//by default its going to create the next stores
+//here you can redefine or define new mutations
+//by default its going to create the next mutations
 /*
 setProducts(products)
 createProducto(product)

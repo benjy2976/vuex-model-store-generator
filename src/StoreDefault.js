@@ -45,7 +45,7 @@ export default class StoreDefault {
     }
 
     //action para objeter la lista de objetos de el servidor
-    this.actions['get' + config.pluralCapital]      = ({state, commit, dispatch}, params = null) => {
+    this.actions['get' + config.pluralCapital]      = ({state, commit, dispatch}, params = {}) => {
       //var commit = store.commit
       if (!model.saved()) {
         return new Promise((resolve, reject) => {

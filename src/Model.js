@@ -37,7 +37,7 @@ export default class Model {
   }
 
   //funcion para obtener el listado de Objetos de la base de datos
-  getAll(params = null) {
+  getAll(params = {}) {
     params = Object.assign(params, this.params)
     return axios.get(this.route, {
       params: params,
