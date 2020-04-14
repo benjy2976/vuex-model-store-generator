@@ -52,7 +52,7 @@ export default class Model {
 
   //funcion para mostrar un objeto de la base de datos
   show(id) {
-    return axios.get(this.route + '/' + d[this.key], {
+    return axios.get(this.route + '/' + id, {
       params: this.params,
     })
   }
