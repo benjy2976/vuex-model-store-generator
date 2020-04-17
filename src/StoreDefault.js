@@ -43,6 +43,10 @@ export default class StoreDefault {
     this.getters['selected' + config.singularCapital] = (state) => {
       return state[state.singular]
     }
+    //getter para obtener el objeto seleccionado
+    this.getters['get' + config.singularCapital+'Selected'] = (state) => {
+      return state[state.singular]
+    }
 
     //action para objeter la lista de objetos de el servidor
     this.actions['get' + config.pluralCapital]      = ({state, commit, dispatch}, params = {}) => {
@@ -136,6 +140,10 @@ export default class StoreDefault {
       //action que se ejecuta despues de seleccionar un Objeto
       this.actions['afterSelect' + config.singularCapital] = (store) => {
 
+      }
+
+      this.actions['deselect' + config.singularCapital]      = ({state, commit}) => {
+        commit('set' + state.singularCapital + 'Selected', model.getDefault())
       }
     }
     //mutacion para setear el listado de objetos
