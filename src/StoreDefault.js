@@ -143,7 +143,7 @@ export default class StoreDefault {
       }
 
       this.actions['deselect' + config.singularCapital]      = ({state, commit}) => {
-        commit('set' + state.singularCapital + 'Selected', model.getDefault())
+        commit('clear' + state.singularCapital + 'Selected')
       }
     }
     //mutacion para setear el listado de objetos
@@ -166,8 +166,11 @@ export default class StoreDefault {
       this.mutations['set' + config.singularCapital + 'Selected'] = (state, data) => {
         state[state.singular] = Object.assign(state[state.singular], data)
       }
+      //mutacion para seleccionar un Objeto
+      this.mutations['clear' + config.singularCapital + 'Selected'] = (state, data) => {
+        state[state.singular] =  model.getDefault()
+      }
     }
-
     this.state     = Object.assign(this.state, state)
     this.getters   = Object.assign(this.getters, getters)
     this.actions   = Object.assign(this.actions, actions)

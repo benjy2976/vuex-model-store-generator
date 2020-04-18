@@ -100,6 +100,11 @@ export default class Model {
     if ((hashMd5[this.alias] === undefined && !!localStorage.getItem(this.alias))) {
       localStorage.removeItem(this.alias)
     }
+    /*console.log(this.alias )
+    console.log(hashMd5[this.alias] )
+    if (!!localStorage.getItem(this.alias)) {
+      console.log(md5(localStorage.getItem(this.alias)))
+    }*/
     if (!!localStorage.getItem(this.alias) && hashMd5[this.alias] !== md5(localStorage.getItem(this.alias))) {
       localStorage.removeItem(this.alias)
     }
@@ -138,12 +143,12 @@ export default class Model {
 
   //getter para saber si se puede seleccionar un objeto de la lista de objetos
   isSelectable() {
-    return this.selectable
+    return this.selectable===true
   }
 
   //getter para obtener el valor por default de el objeto
   getDefault() {
-    return this.default
+    return JSON.parse(JSON.stringify(this.default))
   }
 
   //getter para obtener el nombre del atributo que hace referencia al nombre del Objeto
