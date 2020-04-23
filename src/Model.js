@@ -36,6 +36,13 @@ export default class Model {
     this.params     = defaultValues.params
   }
 
+  get(url='', params={}){
+    params = Object.assign(params, this.params)
+    url = this.route+'/'+url
+    return axios.get(url, {
+      params: params,
+    })
+  }
   //funcion para obtener el listado de Objetos de la base de datos
   getAll(params = {}) {
     params = Object.assign(params, this.params)
