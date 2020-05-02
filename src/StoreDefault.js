@@ -1,13 +1,9 @@
 export default class StoreDefault {
   constructor(model, state = {}, getters = {}, actions = {}, mutations = {}) {
     let defData            = {
-      singular: null,
-      plural  : null,
       key     : 'id',
     }
     let config             = Object.assign(defData, model.getConfigForStore())
-    config.singularCapital = config.singular[0].toUpperCase() + config.singular.slice(1)
-    config.pluralCapital   = config.plural[0].toUpperCase() + config.plural.slice(1)
 
     this.namespaced = true
     this.state      = {

@@ -11,8 +11,6 @@ export default class Model {
       store     : false,//la condicional que define si se guardara en el localstorage
       methods   : null, //define los métodos adicionales utilizados por el modelo
       /*config for storeDefault*/
-      singular  : null,//alias para referirse al objeto de manera singular
-      plural    : null,//alias para referirse al objeto de manera plural
       key       : 'id',//define el primary key que se usara para acceder al objeto
       name      : 'name',//nombre del atributo name en la base de datos
       selectable: false,//condicional para definir si el objeto es seleccionable
@@ -142,8 +140,6 @@ export default class Model {
   //funcion para obtener los parámetros de configuración necesarios para el StoreDefault
   getConfigForStore() {
     return {
-      singular: this.singular,
-      plural  : this.plural,
       key     : this.key,
     }
   }
