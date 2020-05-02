@@ -1,22 +1,23 @@
 export default class StoreDefault {
   constructor(model, state = {}, getters = {}, actions = {}, mutations = {}) {
-    let defData                 = {
-      singular  : null,
-      plural    : null,
-      key       : 'id',
+    let defData                                               = {
+      singular: null,
+      plural  : null,
+      key     : 'id',
     }
-    let config                  = Object.assign(defData, model.getConfigForStore())
-    config.singularCapital      = config.singular[0].toUpperCase() + config.singular.slice(1)
-    config.pluralCapital        = config.plural[0].toUpperCase() + config.plural.slice(1)
-    this.state                  = config
-    this.getters                = {}
-    this.actions                = {}
-    this.mutations              = {}
-    this.state[config.singular] = Object.assign({}, model.getDefault())
-    this.state[config.plural]   = []
+    let config                                                = Object.assign(defData, model.getConfigForStore())
+    config.singularCapital                                    = config.singular[0].toUpperCase() + config.singular.slice(1)
+    config.pluralCapital                                      = config.plural[0].toUpperCase() + config.plural.slice(1)
+    this.namespaced                                                = true
+    this.state                                                = config
+    this.getters                                              = {}
+    this.actions                                              = {}
+    this.mutations                                            = {}
+    this.state['itemSelected']                               = Object.assign({loading: false}, model.getDefault())
+    this.state['items']                                 = []
     //getter para obtenner el objeto seleccionado
-    this.getters['get' + config.singularCapital]      = (state) => (id) => {
-      let c = [...state[state.plural]]
+    this.getters['find']              = (state) => (id) => {
+      let c = [...state.items]
       c     = c.filter(d => d[state.key] === id)
       if (c.length === 1) {
         return c[0]
@@ -25,8 +26,8 @@ export default class StoreDefault {
       }
     }
     //getter para obtener el nombre de el objeto seleccionado
-    this.getters[config.singular + 'Name']            = (state) => (id) => {
-      let c = [...state[state.plural]]
+    this.getters['name']                    = (state) => (id) => {
+      let c = [...state.items]
       c     = c.filter(d => d[state.key] === id)
       if (c.length === 1) {
         return c[0][model.getNameAttribute()]
@@ -36,47 +37,41 @@ export default class StoreDefault {
 
     }
     //getter para optener la lista de objetos
-    this.getters['all' + config.pluralCapital]        = (state) => {
-      return state[state.plural]
+    this.getters['list']                = (state) => {
+      return state.items
     }
     //getter para obtener el objeto seleccionado
-    this.getters['selected' + config.singularCapital] = (state) => {
-      return state[state.singular]
-    }
-    //getter para obtener el objeto seleccionado
-    this.getters['get' + config.singularCapital+'Selected'] = (state) => {
-      return state[state.singular]
+    this.getters['getSelected']         = (state) => {
+      return state.itemSelected
     }
 
     //action para objeter la lista de objetos de el servidor
-    this.actions['get' + config.pluralCapital]      = ({state, commit, dispatch}, params = {}) => {
+    this.actions['get']      = ({state, commit, dispatch}, params = {}) => {
       //var commit = store.commit
       if (!model.saved()) {
         return new Promise((resolve, reject) => {
           model.getAll(params).then(response => {
-            commit('set' + state.pluralCapital, response.data)
-            dispatch('afterGet' + state.pluralCapital)
+            commit('SET_ITEMS', response.data)
+            dispatch('afterGet')
             resolve(response)
           }).catch(error => {
             reject(error)
           })
         })
       } else {
-        commit('set' + state.pluralCapital, model.getStored())
-        dispatch('afterGet' + state.pluralCapital)
+        commit('SET_ITEMS', model.getStored())
+        dispatch('afterGet')
       }
     }
     //action que se ejecuta despues de obtener la lista de objetos
-    this.actions['afterGet' + config.pluralCapital] = (dispatch) => {
-      /*if (state.select) {
-          dispatch('select' + config.singularCapital)
-      }*/
+    this.actions['afterGet'] = (dispatch) => {
+      //
     }
     //action para crear un objeto en la base de datos y en la lista de objetos
-    this.actions['create' + config.singularCapital] = ({state, commit}, data) => {
+    this.actions['create'] = ({state, commit}, data) => {
       return new Promise((resolve, reject) => {
         model.create(data).then(response => {
-          commit('create' + state.singularCapital, response.data)
+          commit('CREATE', response.data)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -84,10 +79,10 @@ export default class StoreDefault {
       })
     }
     //action para actualizar un objeto en la base de datos y en la lista de objetos
-    this.actions['update' + config.singularCapital] = ({state, commit}, data) => {
+    this.actions['update'] = ({state, commit}, data) => {
       return new Promise((resolve, reject) => {
         model.update(data).then(response => {
-          commit('update' + state.singularCapital, response.data)
+          commit('UPDATE', response.data)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -95,10 +90,10 @@ export default class StoreDefault {
       })
     }
     //action para eliminar un objeto de la base de datos y de la lista de objetos
-    this.actions['delete' + config.singularCapital] = ({state, commit}, data) => {
+    this.actions['delete'] = ({state, commit}, data) => {
       return new Promise((resolve, reject) => {
         model.delete(data).then(response => {
-          commit('delete' + state.singularCapital, data)
+          commit('DELETE', data)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -107,23 +102,23 @@ export default class StoreDefault {
     }
     if (model.isSelectable()) {
       //action para saleccionar un objeto * busca en la lista de objetos y si no lo encuenta hace un request
-      this.actions['select' + config.singularCapital]      = ({state, commit, dispatch}, id) => {
+      this.actions['selectItem']      = ({state, commit, dispatch}, id) => {
         return new Promise((resolve, reject) => {
-          if (state[state.singular][state.key] !== parseInt(id)) {
-            commit('set' + state.singularCapital + 'Selected', model.getDefault())
-            let d = state[state.plural].filter(d => parseInt(d[state.key]) === parseInt(id))
+          if (state.itemSelected[state.key] !== parseInt(id)) {
+            commit('SET_SELECTED', Object.assign(model.getDefault(), {loading: true}))
+            let d = state.items.filter(d => parseInt(d[state.key]) === parseInt(id))
             if (d.length === 1) {
               d[0].loaded = true
-              commit('set' + state.singularCapital + 'Selected', d[0])
-              dispatch('afterSelect' + state.singularCapital)
+              commit('SET_SELECTED', Object.assign(d[0], {loading: false}))
+              dispatch('afterSelect')
               resolve({
                         status: true,
                         data  : d[0]
                       })
             } else {
               model.show(id).then(response => {
-                commit('set' + state.singularCapital + 'Selected', response.data)
-                dispatch('afterSelect' + state.singularCapital)
+                commit('SET_SELECTED', Object.assign(response.data, {loading: false}))
+                dispatch('afterSelect')
                 resolve(response)
               }).catch(error => {
                 reject(error)
@@ -132,43 +127,48 @@ export default class StoreDefault {
           } else {
             resolve({
                       status: true,
-                      data  : state[state.singular]
+                      data  : state.itemSelected
                     })
           }
         })
       }
       //action que se ejecuta despues de seleccionar un Objeto
-      this.actions['afterSelect' + config.singularCapital] = (store) => {
-
+      this.actions['afterSelect'] = (store) => {
+        //
       }
 
-      this.actions['deselect' + config.singularCapital]      = ({state, commit}) => {
-        commit('clear' + state.singularCapital + 'Selected')
+      this.actions['deselect'] = ({state, commit}) => {
+        commit('CLEAR_SELECTED')
       }
     }
     //mutacion para setear el listado de objetos
-    this.mutations['set' + config.pluralCapital]      = (state, data) => {
-      state[state.plural] = data
-      model.save(state[state.plural])
+    this.mutations['SET_ITEMS']      = (state, data) => {
+      state.items= data
+      model.save(state.items)
     }
     //mutacion para agretar un objeto a la lista de objetos
-    this.mutations['create' + config.singularCapital] = (state, data) => {
-      state[state.plural].push(data)
+    this.mutations['CREATE'] = (state, data) => {
+      state.items.push(data)
     }
     //mutacion para actualizar un objeto de la lista de objetos
-    this.mutations['update' + config.singularCapital] = (state, data) => {
-      let index = state[state.plural].findIndex(d => d[state.key] === data[state.key])
-      state[state.plural][index]=Object.assign(state[state.plural][index], data)
-      //Vue.set(state[state.plural], index, data)
+    this.mutations['UPDATE'] = (state, data) => {
+      let index                  = state.items.findIndex(d => d[state.key] === data[state.key])
+      state.items[index] = Object.assign(state.items[index], data)
+      //Vue.set(state.items, index, data)
+    }
+    //mutacion para actualizar un objeto de la lista de objetos
+    this.mutations['DELETE'] = (state, data) => {
+      let index                  = state.items.findIndex(d => d[state.key] === data[state.key])
+      state.items[index] = state.items.splice(index, 1)
     }
     if (model.isSelectable()) {
       //mutacion para seleccionar un Objeto
-      this.mutations['set' + config.singularCapital + 'Selected'] = (state, data) => {
-        state[state.singular] = Object.assign(state[state.singular], data)
+      this.mutations['SET_SELECTED']   = (state, data) => {
+        state.itemSelected = Object.assign(model.getDefault(), data)
       }
       //mutacion para seleccionar un Objeto
-      this.mutations['clear' + config.singularCapital + 'Selected'] = (state, data) => {
-        state[state.singular] =  model.getDefault()
+      this.mutations['CLEAR_SELECTED'] = (state, data) => {
+        state.itemSelected = model.getDefault()
       }
     }
     this.state     = Object.assign(this.state, state)
