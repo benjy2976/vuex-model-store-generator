@@ -13,6 +13,7 @@ export default class Model {
       /*config for storeDefault*/
       key       : 'id',//define el primary key que se usara para acceder al objeto
       name      : 'name',//nombre del atributo name en la base de datos
+      relations : [],//relaciones con otros models
       selectable: false,//condicional para definir si el objeto es seleccionable
       default   : {},//valor del objeto por defecto,
       params    : {modeljs: true}//aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
@@ -29,18 +30,20 @@ export default class Model {
     this.plural     = defaultValues.plural
     this.key        = defaultValues.key
     this.name       = defaultValues.name
+    this.relations  = defaultValues.relations
     this.selectable = defaultValues.selectable
     this.default    = defaultValues.default
     this.params     = defaultValues.params
   }
 
-  get(url='', params={}){
+  get(url = '', params = {}) {
     params = Object.assign(params, this.params)
-    url = this.route+'/'+url
+    url    = this.route + '/' + url
     return axios.get(url, {
       params: params,
     })
   }
+
   //funcion para obtener el listado de Objetos de la base de datos
   getAll(params = {}) {
     params = Object.assign(params, this.params)
@@ -140,13 +143,14 @@ export default class Model {
   //funcion para obtener los parámetros de configuración necesarios para el StoreDefault
   getConfigForStore() {
     return {
-      key     : this.key,
+      key      : this.key,
+      relations: this.relations
     }
   }
 
   //getter para saber si se puede seleccionar un objeto de la lista de objetos
   isSelectable() {
-    return this.selectable===true
+    return this.selectable === true
   }
 
   //getter para obtener el valor por default de el objeto

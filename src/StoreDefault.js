@@ -1,39 +1,42 @@
+import {normalizeRelations, resolveRelations} from "./helpers"
+
 export default class StoreDefault {
   constructor(model, state = {}, getters = {}, actions = {}, mutations = {}) {
-    let defData            = {
-      key     : 'id',
+    let defData = {
+      key: 'id',
     }
-    let config             = Object.assign(defData, model.getConfigForStore())
+    let config  = Object.assign(defData, model.getConfigForStore())
 
     this.namespaced = true
     this.state      = {
       itemSelected: Object.assign({loading: false}, model.getDefault()),
       items       : [],
-      key         : config.key
+      key         : config.key,
+      relations   : config.relations
     }
     this.getters    = {
-      //getter para obtenner el objeto seleccionado
-      find    : (state) => (id) => {
-        let c = [...state.items]
-        c     = c.filter(d => d[state.key] === id)
-        if (c.length === 1) {
-          return c[0]
-        } else {
-          return model.getDefault()
-        }
-      }, //getter para obtenner el nombre del objeto seleccionado
+      //getter para obtenner el nombre del objeto seleccionado
       name    : (state) => (id) => {
         let c = [...state.items]
-        c     = c.filter(d => d[state.key] === id)
-        if (c.length === 1) {
-          return c[0][model.getNameAttribute()]
+        c     = c.find(d => d[state.key] === id)
+        if (c !== undefined) {
+          return c[model.getNameAttribute()]
         } else {
           return null
         }
 
+      },//getter para obtenner el objeto seleccionado
+      find    : (state, _, __, rootGetters) => (id) => {
+        let c = [...state.items]
+        c     = c.find(d => d[state.key] === id)
+        if (c !== undefined) {
+          return resolveRelations(c, state.relations, rootGetters)
+        } else {
+          return model.getDefault()
+        }
       }, //getter para optener la lista de objetos
-      list    : (state) => {
-        return state.items
+      list    : (state, getters) => {
+        return state.items.map(item => getters.find(item[state.key]))
       }, //getter para obtener el objeto seleccionado
       selected: (state) => {
         return state.itemSelected
