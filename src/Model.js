@@ -44,6 +44,12 @@ export default class Model {
     })
   }
 
+  post(url = '', params = {}) {
+    params = Object.assign(params, this.params)
+    url    = this.route + '/' + url
+    return axios.post(url, params)
+  }
+
   //funcion para obtener el listado de Objetos de la base de datos
   getAll(params = {}) {
     params = Object.assign(params, this.params)

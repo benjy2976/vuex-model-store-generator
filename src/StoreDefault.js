@@ -45,7 +45,7 @@ export default class StoreDefault {
 
     this.actions   = {
       //action para objeter la lista de objetos de el servidor
-      get     : ({state, commit, dispatch}, params = {}) => {
+      get     : ({commit, dispatch}, params = {}) => {
         //var commit = store.commit
         if (!model.saved()) {
           return new Promise((resolve, reject) => {
@@ -65,7 +65,7 @@ export default class StoreDefault {
       afterGet: (dispatch) => {
         //
       }, //action para crear un objeto en la base de datos y en la lista de objetos
-      create  : ({state, commit}, data) => {
+      create  : ({commit}, data) => {
         return new Promise((resolve, reject) => {
           model.create(data).then(response => {
             commit('CREATE', response.data)
@@ -75,7 +75,7 @@ export default class StoreDefault {
           })
         })
       }, //action para actualizar un objeto en la base de datos y en la lista de objetos
-      update  : ({state, commit}, data) => {
+      update  : ({commit}, data) => {
         return new Promise((resolve, reject) => {
           model.update(data).then(response => {
             commit('UPDATE', response.data)
@@ -85,7 +85,7 @@ export default class StoreDefault {
           })
         })
       }, //action para eliminar un objeto de la base de datos y de la lista de objetos
-      delete  : ({state, commit}, data) => {
+      delete  : ({commit}, data) => {
         return new Promise((resolve, reject) => {
           model.delete(data).then(response => {
             commit('DELETE', data)
