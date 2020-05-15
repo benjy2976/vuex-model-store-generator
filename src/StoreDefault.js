@@ -96,9 +96,9 @@ export default class StoreDefault {
           })
         })
       },
-      syncItems: ({ commit, getters }, items) => {
+      syncItems: ({ dispatch }, items) => {
         for (let index in items) {
-          dispatch('sincItem', items[index])
+          dispatch('syncItem', items[index])
         }
       },
       syncItem: ({ commit, getters }, item) => {
