@@ -1,4 +1,5 @@
 import {normalizeRelations, resolveRelations} from "./helpers"
+import Vue from 'vue'
 
 export default class StoreDefault {
   constructor(model, state = {}, getters = {}, actions = {}, mutations = {}) {
@@ -94,7 +95,19 @@ export default class StoreDefault {
             reject(error)
           })
         })
-      }
+      },
+      syncItems: ({ commit, getters }, items) => {
+        for (let index in items) {
+          dispatch('sincItem', items[index])
+        }
+      },
+      syncItem: ({ commit, getters }, item) => {
+        if (getters.find(item.id).id !== null) {
+          commit('UPDATE', item)
+        } else {
+          commit('CREATE', item)
+        }
+      },
     }
     this.mutations = {
       //mutacion para setear el listado de objetos
@@ -107,8 +120,8 @@ export default class StoreDefault {
       }, //mutacion para actualizar un objeto de la lista de objetos
       UPDATE   : (state, data) => {
         let index          = state.items.findIndex(d => d[state.key] === data[state.key])
-        state.items[index] = Object.assign(state.items[index], data)
-        //Vue.set(state.items, index, data)
+        //state.items[index] = Object.assign(state.items[index], data)
+        Vue.set(state.items, index, data)
       }, //mutacion para actualizar un objeto de la lista de objetos
       DELETE   : (state, data) => {
         let index          = state.items.findIndex(d => d[state.key] === data[state.key])
