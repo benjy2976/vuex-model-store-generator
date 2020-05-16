@@ -1,4 +1,4 @@
-import {normalizeRelations, resolveRelations} from "./helpers"
+import {normalizeRelations, resolveRelations, exportRelations} from "./helpers"
 import Vue from 'vue'
 
 export default class StoreDefault {
@@ -66,10 +66,10 @@ export default class StoreDefault {
       afterGet: (dispatch) => {
         //
       }, //action para crear un objeto en la base de datos y en la lista de objetos
-      create  : ({commit}, data) => {
+      create  : ({state, commit, dispatch}, data) => {
         return new Promise((resolve, reject) => {
           model.create(data).then(response => {
-            commit('CREATE', response.data)
+            commit('CREATE', exportRelations(response.data, state.relations, dispatch))
             resolve(response)
           }).catch(error => {
             reject(error)
@@ -172,7 +172,8 @@ export default class StoreDefault {
       }
       //mutacion para seleccionar un Objeto
       this.mutations['SET_SELECTED']   = (state, data) => {
-        state.itemSelected = Object.assign(model.getDefault(), data)
+        Vue.set(state, 'itemSelected', data)
+        //state.itemSelected = Object.assign(model.getDefault(), data)
       }
       //mutacion para seleccionar un Objeto
       this.mutations['CLEAR_SELECTED'] = (state, data) => {

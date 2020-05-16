@@ -4,9 +4,9 @@ export function normalizeRelations(data, fields) {
     ...fields.reduce(
       (prev, field) => ({
         ...prev,
-        [field.atribute]: Array.isArray(data[field.atribute])
-          ? data[field.atribute].map(x => x.id)
-          : data[field.atribute].id
+        [field.attribute]: Array.isArray(data[field.attribute])
+          ? data[field.attribute].map(x => x.id)
+          : data[field.attribute].id
       }),
       {}
     )
@@ -19,11 +19,25 @@ export function resolveRelations(data, fields, rootGetters) {
     ...fields.reduce(
       (prev, field) => ({
         ...prev,
-        [field.atribute]: Array.isArray(data[field.atribute])
-          ? data[field.atribute].map(x => rootGetters[`${field.module}/find`](x))
-          : rootGetters[`${field.module}/find`](data[field.atribute])
+        [field.attribute]: Array.isArray(data[field.attribute])
+          ? data[field.attribute].map(x => rootGetters[`${field.module}/find`](x))
+          : rootGetters[`${field.module}/find`](data[field.attribute])
       }),
       {}
     )
   };
+}
+
+export function exportRelations(data, fields, dispatch) {
+  console.log(dispatch)
+  for(const index in fields){
+    let field = fields[index]
+    let attr = data[field.attribute]
+    console.log(attr)
+    if(attr!==undefined&&Array.isArray(attr) && attr.length>0 && typeof attr[0]=== 'object'){
+      dispatch(`${field.module}/syncItems`, attr, { root: true })
+      delete data[field.attribute]
+    }
+  }
+  return data
 }
