@@ -96,6 +96,15 @@ export default class StoreDefault {
           })
         })
       },
+      sync     : ({dispatch}, data) => {
+        if (typeof data === 'object' && data !== null) {
+          if (Array.isArray(data)) {
+            dispatch('syncItems', data)
+          } else {
+            dispatch('syncItem', data)
+          }
+        }
+      },
       syncItems: ({ dispatch }, items) => {
         for (let index in items) {
           dispatch('syncItem', items[index])
