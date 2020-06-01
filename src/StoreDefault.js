@@ -16,7 +16,7 @@ export default class StoreDefault {
       relations   : config.relations
     }
     this.getters    = {
-      //getter para obtenner el nombre del objeto seleccionado
+      // Getter para obtener el nombre del objeto seleccionado
       name    : (state) => (id) => {
         let c = [...state.items]
         c     = c.find(d => d[state.key] === id)
@@ -26,7 +26,9 @@ export default class StoreDefault {
           return null
         }
 
-      },//getter para obtenner el objeto seleccionado
+      },
+
+      // Getter para obtener el objeto seleccionado
       find    : (state, _, __, rootGetters) => (id) => {
         let c = [...state.items]
         c     = c.find(d => d[state.key] === id)
@@ -35,17 +37,21 @@ export default class StoreDefault {
         } else {
           return model.getDefault()
         }
-      }, //getter para optener la lista de objetos
+      },
+
+      // Getter para obtener la lista de objetos
       list    : (state, getters) => {
         return state.items.map(item => getters.find(item[state.key]))
-      }, //getter para obtener el objeto seleccionado
+      },
+
+      // Getter para obtener el objeto seleccionado
       selected: (state) => {
         return state.itemSelected
       }
     }
 
     this.actions   = {
-      //action para objeter la lista de objetos de el servidor
+      // Action para obtener la lista de objetos de el servidor
       get     : ({commit, dispatch}, params = {}) => {
         //var commit = store.commit
         if (!model.saved()) {
@@ -59,13 +65,17 @@ export default class StoreDefault {
             })
           })
         } else {
-          commit('SET_ITEMS', model.getStored())
+          commit('SET_ITEMS', model.getFromLocalStorage())
           dispatch('afterGet')
         }
-      }, //action que se ejecuta despues de obtener la lista de objetos
+      },
+
+      // Action que se ejecuta después de obtener la lista de objetos
       afterGet: (dispatch) => {
         //
-      }, //action para crear un objeto en la base de datos y en la lista de objetos
+      },
+
+      // Action para crear un objeto en la base de datos y en la lista de objetos
       create  : ({state, commit, dispatch}, data) => {
         return new Promise((resolve, reject) => {
           model.create(data).then(response => {
@@ -75,7 +85,9 @@ export default class StoreDefault {
             reject(error)
           })
         })
-      }, //action para actualizar un objeto en la base de datos y en la lista de objetos
+      },
+
+      // Action para actualizar un objeto en la base de datos y en la lista de objetos
       update  : ({commit}, data) => {
         return new Promise((resolve, reject) => {
           model.update(data).then(response => {
@@ -85,7 +97,9 @@ export default class StoreDefault {
             reject(error)
           })
         })
-      }, //action para eliminar un objeto de la base de datos y de la lista de objetos
+      },
+
+      // Action para eliminar un objeto de la base de datos y de la lista de objetos
       delete  : ({commit}, data) => {
         return new Promise((resolve, reject) => {
           model.delete(data).then(response => {
@@ -119,19 +133,25 @@ export default class StoreDefault {
       },
     }
     this.mutations = {
-      //mutacion para setear el listado de objetos
+      // Mutation para setear el listado de objetos
       SET_ITEMS: (state, data) => {
         state.items = data
         model.save(state.items)
-      }, //mutacion para agretar un objeto a la lista de objetos
+      },
+
+      // Mutation para agregar un objeto a la lista de objetos
       CREATE   : (state, data) => {
         state.items.push(data)
-      }, //mutacion para actualizar un objeto de la lista de objetos
+      },
+
+      // Mutation para actualizar un objeto de la lista de objetos
       UPDATE   : (state, data) => {
         let index          = state.items.findIndex(d => d[state.key] === data[state.key])
         //state.items[index] = Object.assign(state.items[index], data)
         Vue.set(state.items, index, data)
-      }, //mutacion para actualizar un objeto de la lista de objetos
+      },
+
+      // Mutation para actualizar un objeto de la lista de objetos
       DELETE   : (state, data) => {
         let index          = state.items.findIndex(d => d[state.key] === data[state.key])
         state.items[index] = state.items.splice(index, 1)
@@ -140,7 +160,7 @@ export default class StoreDefault {
 
 
     if (model.isSelectable()) {
-      //action para saleccionar un objeto * busca en la lista de objetos y si no lo encuenta hace un request
+      // Action para seleccionar un objeto * busca en la lista de objetos y si no lo encuentra hace un request
       this.actions['selectItem']  = ({state, commit, dispatch}, id) => {
         return new Promise((resolve, reject) => {
           if (state.itemSelected[state.key] !== parseInt(id)) {
@@ -171,7 +191,8 @@ export default class StoreDefault {
           }
         })
       }
-      //action que se ejecuta despues de seleccionar un Objeto
+
+      // Action que se ejecuta después de seleccionar un Objeto
       this.actions['afterSelect'] = (store) => {
         //
       }
@@ -179,12 +200,14 @@ export default class StoreDefault {
       this.actions['deselect']         = ({state, commit}) => {
         commit('CLEAR_SELECTED')
       }
-      //mutacion para seleccionar un Objeto
+
+      // Mutation para seleccionar un Objeto
       this.mutations['SET_SELECTED']   = (state, data) => {
         Vue.set(state, 'itemSelected', data)
         //state.itemSelected = Object.assign(model.getDefault(), data)
       }
-      //mutacion para seleccionar un Objeto
+
+      // Mutation para seleccionar un Objeto
       this.mutations['CLEAR_SELECTED'] = (state, data) => {
         state.itemSelected = model.getDefault()
       }
