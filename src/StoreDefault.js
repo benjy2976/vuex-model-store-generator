@@ -51,7 +51,7 @@ export default class StoreDefault {
         if (!model.saved()) {
           return new Promise((resolve, reject) => {
             model.getAll(params).then(response => {
-              commit('SET_ITEMS', response.data)
+              dispatch('sync', response.data)
               dispatch('afterGet')
               resolve(response)
             }).catch(error => {
@@ -96,20 +96,30 @@ export default class StoreDefault {
           })
         })
       },
-      sync     : ({dispatch}, data) => {
+      /*
+      ***** action para determinar si se actualizara un objeto o varios de acuerdo al formato de llegada de la data ***
+      */
+      sync     : ({state, commit,dispatch}, data) => {
         if (typeof data === 'object' && data !== null) {
           if (Array.isArray(data)) {
             dispatch('syncItems', data)
           } else {
             dispatch('syncItem', data)
           }
+        model.save(state.items)
         }
       },
+      /*
+      ***** action para sincronizar objetos (items) con los objetos almacenado en el store ***
+      */
       syncItems: ({ dispatch }, items) => {
         for (let index in items) {
           dispatch('syncItem', items[index])
         }
       },
+      /*
+      ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
+      */
       syncItem: ({ commit, getters }, item) => {
         if (getters.find(item.id).id !== null) {
           commit('UPDATE', item)
