@@ -146,7 +146,6 @@ export default class StoreDefault {
       // Mutation para setear el listado de objetos
       SET_ITEMS: (state, data) => {
         state.items = data
-        model.save(state.items)
       },
 
       // Mutation para agregar un objeto a la lista de objetos
