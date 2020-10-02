@@ -6,7 +6,7 @@ export default class StoreDefault {
     let defData = {
       key: 'id',
     }
-    let config  = Object.assign(defData, model.getConfigForStore())
+    let config  = Object.assign(defData, model.getStoreConfig())
 
     this.namespaced = true
     this.state      = {
@@ -45,8 +45,8 @@ export default class StoreDefault {
       },
 
       // Getter para obtener el objeto seleccionado
-      selected: (state) => {
-        return state.itemSelected
+      selected: (state, _, __, rootGetters) => {
+        return resolveRelations(state.itemSelected, state.relations, rootGetters)
       }
     }
 
