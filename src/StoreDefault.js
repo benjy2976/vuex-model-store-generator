@@ -33,7 +33,7 @@ export default class StoreDefault {
         let c = [...state.items]
         c     = c.find(d => d[state.key] === id)
         if (c !== undefined) {
-          return resolveRelations(c, state.relations, rootGetters)
+          return resolveRelations(c, state, rootGetters)
         } else {
           return model.getDefault()
         }
@@ -46,7 +46,7 @@ export default class StoreDefault {
 
       // Getter para obtener el objeto seleccionado
       selected: (state, _, __, rootGetters) => {
-        return resolveRelations(state.itemSelected, state.relations, rootGetters)
+        return resolveRelations(state.itemSelected, state, rootGetters)
       }
     }
 
