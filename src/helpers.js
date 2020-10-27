@@ -32,7 +32,7 @@ function relationLinck(data, alias, relation, key, rootGetters) {
             data[relation.attribute].map(x => rootGetters[`${relation.module}/find`](x)) :
             rootGetters[`${relation.module}/find`](data[relation.attribute])
     } else {
-        return rootGetters[`${relation.module}/list`].filter(d => d[relation.attribute] === data[key])
+        return rootGetters[`${relation.module}/filter`](d => d[relation.attribute] === data[key])
     }
 }
 

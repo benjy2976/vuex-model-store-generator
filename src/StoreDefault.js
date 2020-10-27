@@ -44,6 +44,11 @@ export default class StoreDefault {
         return state.items.map(item => getters.find(item[state.key]))
       },
 
+      // Getter para obtener la lista de objetos filtrados
+      filter: (state, getters) => (filter) => {
+        return state.items.filter(filter).map(item => getters.find(item[state.key]))
+      },
+
       // Getter para obtener el objeto seleccionado
       selected: (state, _, __, rootGetters) => {
         return resolveRelations(state.itemSelected, state, rootGetters)
