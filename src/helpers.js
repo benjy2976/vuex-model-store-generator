@@ -37,11 +37,9 @@ function relationLinck(data, alias, relation, key, rootGetters) {
 }
 
 export function exportRelations(data, relations, dispatch) {
-    console.log(dispatch)
     for (const index in relations) {
         let relation = relations[index]
         let attr = data[relation.attribute]
-        console.log(attr)
         if (attr !== undefined && Array.isArray(attr) && attr.length > 0 && typeof attr[0] === 'object') {
             dispatch(`${relation.module}/syncItems`, attr, {
                 root: true
