@@ -16,6 +16,8 @@ export default class StoreDefault {
       relations: config.relations
     }
     this.getters = {
+      // Getter para obtener el indice de la tabla
+      key: (state) => { return state.key },
       // Getter para obtener el nombre del objeto seleccionado
       name: (state) => (id) => {
         let c = [...state.items]
@@ -81,10 +83,10 @@ export default class StoreDefault {
       },
 
       // Action para crear un objeto en la base de datos y en la lista de objetos
-      create: ({ state, commit, dispatch }, data) => {
+      create: ({ state, commit, dispatch, rootGetters }, data) => {
         return new Promise((resolve, reject) => {
           model.create(data).then(response => {
-            commit('CREATE', exportRelations(response.data, state.relations, dispatch))
+            commit('CREATE', exportRelations(response.data, state, dispatch, rootGetters))
             resolve(response)
           }).catch(error => {
             reject(error)
@@ -222,7 +224,7 @@ export default class StoreDefault {
       }
 
       // Mutation para seleccionar un Objeto
-      this.mutations['CLEAR_SELECTED'] = (state, data) => {
+      this.mutations['CLEAR_SELECTED'] = (state) => {
         state.itemSelected = model.getDefault()
       }
     }

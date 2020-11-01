@@ -35,10 +35,16 @@ const configProducts     = {
     methods   : null, //define los métodos adicionales utilizados por el modelo
 
     /*config for storeDefault*/
-    singular  : 'product',//alias para referirse al objeto de manera singular
-    plural    : 'products', //alias para referirse al objeto de manera plural
     key       : 'id',//define el primary key que se usara para acceder al objeto
     name      : 'name',//nombre del atributo name en la base de datos
+    relations : [// Relaciones con otros models
+        {
+            attribute: 'category_id',
+            alias: 'category',//si no se define se asume le mismo nombre que attribute
+            module: 'categories',
+            hasMany: false// si no se define se asumen como falso
+        }
+    ],
     selectable: false,//condicional para definir si el objeto es seleccionable
     default   : {},//valor del objeto por defecto,
     params    : {modeljs: true}//aquí se configuran parámetros adicionales a enviar en los request
@@ -69,61 +75,83 @@ import {Product} from '../../models'
 
 
 const state = {
-//here you can redefine or define new states
-//by default its going to create the next stores
-/*
-key:"id"
-plural:"products"
-pluralCapital:"Products"
-product:Object
-products:Array[]
-singular:"product"
-singularCapital:"Product"
-*/
-//you do not need to define it, it is going to create automatically 
+    //here you can redefine or define new states
+    //by default its going to create the next stores
+    /* 
+    key:"id"
+    itemSelected:Object
+    items:Array[]
+    relations:Array[]
+     */
+    //you do not need to define it, it is going to create automatically 
 }
 
 const getters = {
-//here you can redefine or define new getters
-//by default its going to create the next getters
-/*
-productName(id)// getter used to access at the name of the product whit the id
-allProducts()//getter used to access at the list os Products
-selectedProduct()// getter used to access at te producto selected (only if is selectable)
-*/
-//you do not need to define it, it is going to create automatically 
-//also you can create other getters if you need
+    //here you can redefine or define new getters
+    //by default its going to create the next getters
+    /* 
+    key: 'id',
+    // Getter para obtener el nombre del objeto seleccionado
+    name: (id) => {...},
+    // Getter para obtener el objeto seleccionado
+    find: (id) => {...},
+    // Getter para obtener la lista de objetos
+    list: [...],
+    // Getter para obtener la lista de objetos filtrados
+    filter: (filter) => [...],
+    // Getter para obtener el objeto seleccionado
+    selected: {...}
+    */
+   
+    // Getter para obtener el indice de la tabla
+    //you do not need to define it, it is going to create automatically 
+    //also you can create other getters if you need
 }
 
 const actions = {
-//here you can redefine or define new actions
-//by default its going to create the next actions
-/*
-getProducts(params)//this action invoque at the getAll(params) from the model an store the response into a state.products 
-//list
-afterGetProducts()//this action is called after the getProducts is dispatched, you yo can redefine it if you need
-createProduct(product)//this action create a new producto, call to the create(product) from the model and add the response 
-//at the state.products list
-updateProduct(product)//this action update a new producto, call to the update(product) from the model and add the response 
-//at the state.products list
-deleteProduct(product)//this action delete a new producto, call to the delete(product) from the model and add the response 
-//at the state.products list
-selectProduct(product)//this actions select one product from the list of products an put tha value into a state.product
-afterSelectProduct()//this action is called after the selectProduct is dispatched, you yo can redefine it if you need
-*/
-//you do not need to define it, it is going to create automatically 
-//also you can create other getters if you need
+    //here you can redefine or define new actions
+    //by default its going to create the next actions
+    /*
+    *** esta acción invoca en getAll (params) del modelo y almacena la respuesta en un estado. ***
+    get(params)//this action invoque at the getAll(params) from the model and store the response into a state.items 
+    *** esta acción se invoca después de que se envía el get, puede redefinirlo si lo necesita ***
+    afterGet()//this action is called after the get is dispatched, you yo can redefine it if you need
+    *** esta acción crea un nuevo item, llama a create(item) desde el modelo y agrega la respuesta ***
+    create(item)//this action create a new item, call to the create(item) from the model and add the response 
+    //at the state.items list
+    *** esta acción modifica un  item, llama a update(item) desde el modelo y agrega la respuesta ***
+    update(item)//this action update a item, call to the update(item) from the model and add the response 
+    //at the state.items list
+    *** esta acción elimina un nuevo elemento, llama a eliminar (elemento) del modelo y agrega la respuesta ***
+    delete(item)//this action delete a new item, call to the delete(item) from the model and add the response 
+    *** action para determinar si se actualizara un objeto o varios de acuerdo al formato de llegada de la data ***
+    sync(item/items)//action to determine if one object or several is updated according to the data arrival format
+    *** action para sincronizar objetos (items) con los objetos almacenado en el store ***
+    syncItems(items)//action to synchronize objects (items) with the objects stored in the store
+    *** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
+    syncItem(item)//action to synchronize an object (item) with an object stored in the store
+    //at the state.items list
+    *** estas acciones seleccionan un elemento de la lista de elementos y ponen el valor en un estado. ***
+    selectItem(item)//this actions select one item from the list of items and put the value into a state.item
+    *** esta acción se llama después de que se envía el artículo seleccionado, puede redefinirlo si lo necesita ***
+    afterSelect()//this action is called after the selectItem is dispatched, you yo can redefine it if you need
+    *** esta accion de seleccioan el itemSelected ***
+    deselect()//this action deselect the itemSelected
+    */
+    //you do not need to define it, it is going to create automatically 
+    //also you can create other getters if you need
 }
 
 const mutations = {
-
 //here you can redefine or define new mutations
 //by default its going to create the next mutations
 /*
-setProducts(products)
-createProducto(product)
-updateProducto(product)
-setProductSelected(product)
+SET_ITEMS(items)
+CREATE(item)
+UPDATE(item)
+DELETE(item)
+SET_SELECTED(item)
+CLEAR_SELECTED()
 */
 }
 
@@ -136,7 +164,7 @@ you need to create a file index.js into a /store folder you have two ways to dec
 import Vue        from 'vue'
 import Vuex       from 'vuex'
 import product    from './modules/product'
-import {Customer} from "../models"
+import {Categorie} from "../core"
 
 Vue.use(Vuex)
 const debug = process.env.NODE_ENV !== 'production'
@@ -144,7 +172,7 @@ const debug = process.env.NODE_ENV !== 'production'
 export default new Vuex.Store({
                                 modules: {
                                   product,
-                                  customer: Customer.getStore(),
+                                  categories: Categorie.getStore(),
                                 },
                                 strict : debug,
                               })
@@ -183,8 +211,8 @@ Routes.beforeEach((to, from, next) => {
             next()
         }
         if (fistLoad) {
-            store.dispatch('getProducts')
-            store.dispatch('getCustomers')
+            store.dispatch('products/get')
+            store.dispatch('categories/get')
             fistLoad = false
         }
     } else {

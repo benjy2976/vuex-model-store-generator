@@ -36,16 +36,39 @@ function relationLinck(data, alias, relation, key, rootGetters) {
     }
 }
 
-export function exportRelations(data, relations, dispatch) {
-    for (const index in relations) {
-        let relation = relations[index]
+export function exportRelations(data, state, dispatch, rootGetters) {
+    return {
+        ...data,
+        ...state.relations.reduce(
+            (prev, relation) => {
+                let attr = data[relation.attribute]
+                if (attr !== undefined && Array.isArray(attr) && attr.length > 0 && typeof attr[0] === 'object') {
+                    dispatch(`${relation.module}/syncItems`, attr, { root: true })
+                    return ({
+                        ...prev,
+                        [relation.attribute]: data[relation.attribute].map(obj => obj[rootGetters[`${relation.module}/key`]])
+                    })
+                }
+                else {
+                    return { ...prev }
+                }
+            }, {}
+        )
+    };
+    /* for (const index in state.relations) {
+        let relation = state.relations[index]
         let attr = data[relation.attribute]
         if (attr !== undefined && Array.isArray(attr) && attr.length > 0 && typeof attr[0] === 'object') {
-            dispatch(`${relation.module}/syncItems`, attr, {
-                root: true
-            })
-            delete data[relation.attribute]
+            dispatch(`${relation.module}/syncItems`, attr, {root: true})
+            data[relation.attribute] = data[relation.attribute].map(obj => obj[rootGetters[`${relation.module}/key`]])
         }
-    }
-    return data
+    } */
+    /* state.relations.forEach(relation => {
+        let attr = data[relation.attribute]
+        if (attr !== undefined && Array.isArray(attr) && attr.length > 0 && typeof attr[0] === 'object') {
+            dispatch(`${relation.module}/syncItems`, attr, { root: true })
+            data[relation.attribute] = data[relation.attribute].map(obj => obj[rootGetters[`${relation.module}/key`]])
+        }
+    });
+    return data */
 }
