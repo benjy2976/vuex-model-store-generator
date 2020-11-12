@@ -31,29 +31,33 @@ export default class StoreDefault {
       },
 
       // Getter para obtener el objeto seleccionado
-      find: (state, _, __, rootGetters) => (id) => {
+      find: (state, getters) => (id) => {
         let c = [...state.items]
         c = c.find(d => d[state.key] === id)
         if (c !== undefined) {
-          return resolveRelations(c, state, rootGetters)
+          return getters.resolve(c)
         } else {
           return model.getDefault()
         }
       },
 
       // Getter para obtener la lista de objetos
-      list: (state, _, __, rootGetters) => {
-        return state.items.map(item => resolveRelations(item, state, rootGetters))
+      list: (state, getters) => {
+        return state.items.map(item => getters.resolve(item))
       },
 
       // Getter para obtener la lista de objetos filtrados
-      filter: (state, _, __, rootGetters) => (filter) => {
-        return state.items.filter(filter).map(item => resolveRelations(item, state, rootGetters))
+      filter: (state, getters) => (filter) => {
+        return state.items.filter(filter).map(item => getters.resolve(item))
       },
 
       // Getter para obtener el objeto seleccionado
-      selected: (state, _, __, rootGetters) => {
-        return resolveRelations(state.itemSelected, state, rootGetters)
+      selected: (state, getters) => {
+        return getters.resolve(state.itemSelected)
+      },
+      // Getter para resolver las relaciones
+      resolve: (state, _, __, rootGetters) => (item) => {
+        return resolveRelations(item, state, rootGetters)
       }
     }
 

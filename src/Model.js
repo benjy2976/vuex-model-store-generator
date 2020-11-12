@@ -1,45 +1,49 @@
-import {md5}        from 'pure-md5'
+import { md5 } from 'pure-md5'
 import StoreDefault from "./StoreDefault"
-import axios        from 'axios'
+import axios from 'axios'
 
 export default class Model {
 
   constructor(config) {
     let defaultValues = {
-      alias     : null,// Alias utilizado para almacenar en el localstorage
-      route     : null,// Ruta donde se encuentra el resource
-      hash      : false,// La condicional si se va a validar el md5
-      store     : false,// La condicional que define si se guardara en el localstorage
-      methods   : null, // Define los métodos adicionales utilizados por el modelo
+      alias: null,// Alias utilizado para almacenar en el localstorage
+      route: null,// Ruta donde se encuentra el resource
+      hash: false,// La condicional si se va a validar el md5
+      store: false,// La condicional que define si se guardara en el localstorage
+      methods: null, // Define los métodos adicionales utilizados por el modelo
       /*config for storeDefault*/
-      key       : 'id',// Define el primary key que se usara para acceder al objeto
-      name      : 'name',// Nombre del atributo name en la base de datos
-      relations : [],// Relaciones con otros models
+      key: 'id',// Define el primary key que se usara para acceder al objeto
+      name: 'name',// Nombre del atributo name en la base de datos
+      relations: [],// Relaciones con otros models
       selectable: false,// Condicional para definir si el objeto es seleccionable
-      default   : {},// Valor del objeto por defecto,
-      params    : {modeljs: true}// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
+      default: {},// Valor del objeto por defecto,
+      params: { modeljs: true }// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
     }
-    defaultValues     = Object.assign(defaultValues, config)
-    this.alias        = defaultValues.alias
-    this.route        = defaultValues.route
-    this.hash         = defaultValues.hash
-    this.store        = defaultValues.store
+    defaultValues = Object.assign(defaultValues, config)
+    this.alias = defaultValues.alias
+    this.route = defaultValues.route
+    this.hash = defaultValues.hash
+    this.store = defaultValues.store
     for (const prop in defaultValues.methods) {
       this[prop] = defaultValues.methods[prop]
     }
-    this.singular   = defaultValues.singular
-    this.plural     = defaultValues.plural
-    this.key        = defaultValues.key
-    this.name       = defaultValues.name
-    this.relations  = defaultValues.relations
+    this.singular = defaultValues.singular
+    this.plural = defaultValues.plural
+    this.key = defaultValues.key
+    this.name = defaultValues.name
+    this.relations = defaultValues.relations
     this.selectable = defaultValues.selectable
-    this.default    = defaultValues.default
-    this.params     = defaultValues.params
+    this.default = defaultValues.default
+    this.params = defaultValues.params
+    this.state = {}
+    this.getters = {}
+    this.actions = {}
+    this.mutations = {}
   }
 
   get(url = '', params = {}) {
     params = Object.assign(params, this.params)
-    url    = this.route + '/' + url
+    url = this.route + '/' + url
     return axios.get(url, {
       params: params,
     })
@@ -47,7 +51,7 @@ export default class Model {
 
   post(url = '', params = {}) {
     params = Object.assign(params, this.params)
-    url    = this.route + '/' + url
+    url = this.route + '/' + url
     return axios.post(url, params)
   }
 
@@ -126,31 +130,43 @@ export default class Model {
   }
 
   // Getter para obtener el store por defecto para el modelo
-  getStore(state = {}, getters = {}, actions = {}, mutations = {}) {
-    return new StoreDefault(this, state, getters, actions, mutations)
+  setStore({ state = null, getters = null, actions = null, mutations = null }) {
+    this.state = state === null ? this.state : state
+    this.getters = getters === null ? this.getters : getters
+    this.actions = actions === null ? this.actions : actions
+    this.mutations = mutations === null ? this.stmutationsate : mutations
+    return this
+  }
+  // Getter para obtener el store por defecto para el modelo
+  getStore(state = null, getters = null, actions = null, mutations = null) {
+    this.state = state === null ? this.state : state
+    this.getters = getters === null ? this.getters : getters
+    this.actions = actions === null ? this.actions : actions
+    this.mutations = mutations === null ? this.stmutationsate : mutations
+    return new StoreDefault(this, this.state, this.getters, this.actions, this.mutations)
   }
 
   // Getter para obtener todos los parámetros de configuración del modelo
   getConfig() {
     return {
-      alias     : this.alias,
-      route     : this.route,
-      hash      : this.hash,
-      store     : this.store,
-      methods   : this.methods,
-      singular  : this.singular,
-      plural    : this.plural,
-      key       : this.key,
-      name      : this.name,
+      alias: this.alias,
+      route: this.route,
+      hash: this.hash,
+      store: this.store,
+      methods: this.methods,
+      singular: this.singular,
+      plural: this.plural,
+      key: this.key,
+      name: this.name,
       selectable: this.selectable,
-      default   : this.default
+      default: this.default
     }
   }
 
   // Función para obtener los parámetros de configuración necesarios para el StoreDefault
   getStoreConfig() {
     return {
-      key      : this.key,
+      key: this.key,
       relations: this.relations
     }
   }

@@ -101,6 +101,9 @@ const getters = {
     filter: (filter) => [...],
     // Getter para obtener el objeto seleccionado
     selected: {...}
+    // Getter para resolver las relaciones 
+    *** se debe de sobrecargar este metodo si se quiere poner funciones personalizadas***
+    resolve: {...}
     */
    
     // Getter para obtener el indice de la tabla
