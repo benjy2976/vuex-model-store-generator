@@ -142,7 +142,7 @@ export default class Model {
     this.state = state === null ? this.state : state
     this.getters = getters === null ? this.getters : getters
     this.actions = actions === null ? this.actions : actions
-    this.mutations = mutations === null ? this.stmutationsate : mutations
+    this.mutations = mutations === null ? this.mutations : mutations
     return new StoreDefault(this, this.state, this.getters, this.actions, this.mutations)
   }
 
