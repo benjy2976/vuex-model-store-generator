@@ -145,11 +145,11 @@ export default class StoreDefault {
       /*
       ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
       */
-      syncItem: ({ commit, getters }, item) => {
+      syncItem: ({ state, commit, getters, dispatch, rootGetters }, item) => {
         if (getters.find(item.id).id !== null) {
-          commit('UPDATE', item)
+          commit('UPDATE', exportRelations(item, state, dispatch, rootGetters))
         } else {
-          commit('CREATE', item)
+          commit('CREATE', exportRelations(item, state, dispatch, rootGetters))
         }
       },
     }
