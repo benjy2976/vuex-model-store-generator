@@ -137,10 +137,9 @@ export default class StoreDefault {
       /*
       ***** action para sincronizar objetos (items) con los objetos almacenado en el store ***
       */
-      syncItems: ({ dispatch }, items) => {
-        for (let index in items) {
-          dispatch('syncItem', items[index])
-        }
+      syncItems: ({ commit, dispatch, rootGetters }, items) => {
+        let a = { items, dispatch, rootGetters }
+        commit('SYNC_ITEMS', a)
       },
       /*
       ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
@@ -158,6 +157,17 @@ export default class StoreDefault {
       SET_ITEMS: (state, data) => {
         state.items = data
       },
+      // Mutation para setear el listado de objetos
+      SYNC_ITEMS: (state, { items, dispatch, rootGetters }) => {
+        for (let index in items) {
+          let i = state.items.findIndex(d => d[state.key] === items[index][state.key])
+          if (i === -1) {
+            state.items.push(exportRelations(items[index], state, dispatch, rootGetters))
+          } else {
+            Vue.set(state.items, i, exportRelations(items[index], state, dispatch, rootGetters))
+          }
+        }
+      },
 
       // Mutation para agregar un objeto a la lista de objetos
       CREATE: (state, data) => {
@@ -174,7 +184,7 @@ export default class StoreDefault {
       // Mutation para actualizar un objeto de la lista de objetos
       DELETE: (state, data) => {
         let index = state.items.findIndex(d => d[state.key] === data[state.key])
-        state.items[index] = state.items.splice(index, 1)
+        state.items.splice(index, 1)
       }
     }
 
