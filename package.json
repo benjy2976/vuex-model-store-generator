@@ -1,6 +1,6 @@
 {
   "name": "vuex-model-store-generator",
-  "version": "0.2.22",
+  "version": "0.2.23",
   "description": "generator of models and store default for vuex",
   "main": "src/Model.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/benjy2976/vuex-model-store-generator#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "pure-md5": "^0.1.9",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
