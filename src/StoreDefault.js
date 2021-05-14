@@ -90,7 +90,7 @@ export default class StoreDefault {
       create: ({ state, commit, dispatch, rootGetters }, data) => {
         return new Promise((resolve, reject) => {
           model.create(data).then(response => {
-            commit('CREATE', exportRelations(response.data, state, dispatch, rootGetters))
+            dispatch('syncItem', exportRelations(response.data, state, dispatch, rootGetters))
             resolve(response)
           }).catch(error => {
             reject(error)
@@ -102,7 +102,7 @@ export default class StoreDefault {
       update: ({ commit }, data) => {
         return new Promise((resolve, reject) => {
           model.update(data).then(response => {
-            commit('UPDATE', response.data)
+            dispatch('syncItem', exportRelations(response.data, state, dispatch, rootGetters))
             resolve(response)
           }).catch(error => {
             reject(error)
