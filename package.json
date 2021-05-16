@@ -1,6 +1,6 @@
 {
   "name": "vuex-model-store-generator",
-  "version": "0.2.24",
+  "version": "0.2.25",
   "description": "generator of models and store default for vuex",
   "main": "src/Model.js",
   "scripts": {

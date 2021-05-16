@@ -183,7 +183,8 @@ export default new Vuex.Store({
 in your app.js you can invoque like this
 ````js
 
-window.axios = require('axios')
+import axios from 'axios';
+window.axios = axios
 axios.interceptors.request.use(function (config) {
     config.headers.Authorization= 'Bearer ' + auth.getToken()
     return config;

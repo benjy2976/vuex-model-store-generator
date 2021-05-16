@@ -111,10 +111,11 @@ export default class StoreDefault {
       },
 
       // Action para eliminar un objeto de la base de datos y de la lista de objetos
-      delete: ({ commit }, data) => {
+      delete: ({ state, commit }, data) => {
         return new Promise((resolve, reject) => {
           model.delete(data).then(response => {
             commit('DELETE', data)
+            model.save(state.items)
             resolve(response)
           }).catch(error => {
             reject(error)
@@ -131,7 +132,6 @@ export default class StoreDefault {
           } else {
             dispatch('syncItem', data)
           }
-          model.save(state.items)
         }
       },
       /*
@@ -140,6 +140,7 @@ export default class StoreDefault {
       syncItems: ({ commit, dispatch, rootGetters }, items) => {
         let a = { items, dispatch, rootGetters }
         commit('SYNC_ITEMS', a)
+        model.save(state.items)
       },
       /*
       ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
@@ -150,6 +151,7 @@ export default class StoreDefault {
         } else {
           commit('CREATE', exportRelations(item, state, dispatch, rootGetters))
         }
+        model.save(state.items)
       },
     }
     this.mutations = {
