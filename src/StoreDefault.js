@@ -63,11 +63,12 @@ export default class StoreDefault {
 
     this.actions = {
       // Action para obtener la lista de objetos de el servidor
-      get: ({ commit, dispatch }, params = {}) => {
+      get: ({ dispatch }, params = {}) => {
         //var commit = store.commit
         if (!model.saved()) {
           return new Promise((resolve, reject) => {
             model.getAll(params).then(response => {
+              model.save(response.data)
               dispatch('sync', response.data)
               dispatch('afterGet')
               resolve(response)
@@ -76,7 +77,7 @@ export default class StoreDefault {
             })
           })
         } else {
-          commit('SET_ITEMS', model.getFromLocalStorage())
+          dispatch('sync', model.getFromLocalStorage())
           dispatch('afterGet')
         }
       },
@@ -115,7 +116,6 @@ export default class StoreDefault {
         return new Promise((resolve, reject) => {
           model.delete(data).then(response => {
             commit('DELETE', data)
-            model.save(state.items)
             resolve(response)
           }).catch(error => {
             reject(error)
@@ -140,18 +140,16 @@ export default class StoreDefault {
       syncItems: ({ commit, dispatch, rootGetters }, items) => {
         let a = { items, dispatch, rootGetters }
         commit('SYNC_ITEMS', a)
-        model.save(state.items)
       },
       /*
       ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
       */
       syncItem: ({ state, commit, getters, dispatch, rootGetters }, item) => {
-        if (getters.find(item.id).id !== null) {
+        if (getters.find(item.id).id !== null && getters.find(item.id).id !== undefined) {
           commit('UPDATE', exportRelations(item, state, dispatch, rootGetters))
         } else {
           commit('CREATE', exportRelations(item, state, dispatch, rootGetters))
         }
-        model.save(state.items)
       },
     }
     this.mutations = {
@@ -166,7 +164,8 @@ export default class StoreDefault {
           if (i === -1) {
             state.items.push(exportRelations(items[index], state, dispatch, rootGetters))
           } else {
-            Vue.set(state.items, i, exportRelations(items[index], state, dispatch, rootGetters))
+            state.items[i] = Object.assign(state.items[i], exportRelations(items[index], state, dispatch, rootGetters))
+            //Vue.set(state.items, i, exportRelations(items[index], state, dispatch, rootGetters))
           }
         }
       },
@@ -179,8 +178,8 @@ export default class StoreDefault {
       // Mutation para actualizar un objeto de la lista de objetos
       UPDATE: (state, data) => {
         let index = state.items.findIndex(d => d[state.key] === data[state.key])
-        //state.items[index] = Object.assign(state.items[index], data)
-        Vue.set(state.items, index, data)
+        state.items[index] = Object.assign(state.items[index], data)
+        //Vue.set(state.items, index, data)
       },
 
       // Mutation para actualizar un objeto de la lista de objetos

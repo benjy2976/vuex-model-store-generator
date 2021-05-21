@@ -28,7 +28,7 @@ export function resolveRelations(data, state, rootGetters) {
 
 function relationLinck(data, alias, relation, key, rootGetters) {
     if (relation.hasMany === undefined || relation.hasMany === false) {
-        return Array.isArray(data[alias]) ?
+        return Array.isArray(data[relation.attribute]) ?
             data[relation.attribute].map(x => rootGetters[`${relation.module}/find`](x)) :
             rootGetters[`${relation.module}/find`](data[relation.attribute])
     } else {
@@ -37,6 +37,9 @@ function relationLinck(data, alias, relation, key, rootGetters) {
 }
 
 export function exportRelations(data, state, dispatch, rootGetters) {
+    if(data.pivot!==undefined){
+        delete data.pivot
+      }
     return {
         ...data,
         ...state.relations.reduce(
