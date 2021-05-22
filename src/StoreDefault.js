@@ -207,6 +207,7 @@ export default class StoreDefault {
               })
             } else {
               model.show(id).then(response => {
+                dispatch('syncItem', response.data)
                 commit('SET_SELECTED', Object.assign(response.data, { loading: false }))
                 dispatch('afterSelect')
                 resolve(response)
