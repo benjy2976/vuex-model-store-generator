@@ -12,6 +12,7 @@ export default class Model {
       /*config for storeDefault*/
       key       : 'id',// Define el primary key que se usara para acceder al objeto
       name      : 'name',// Nombre del atributo name en la base de datos
+      maxRelationsResolve: 3,// Relaciones con otros models
       relations : [],// Relaciones con otros models
       selectable: false,// Condicional para definir si el objeto es seleccionable
       default   : {},// Valor del objeto por defecto,
@@ -144,10 +145,20 @@ export default class Model {
   // Función para obtener los parámetros de configuración necesarios para el StoreDefault
   getStoreConfig() {
     return {
-      key      : this.key,
-      relations: this.relations
+      key: this.key,
+      moduleAlias: this.alias,
+      maxRelationsResolve: this.maxRelationsResolve,
+      relations: this.relations.map(relation => {
+          return {
+              ...relation,
+              ['hasMany']: (relation.hasMany === undefined )?false:relation.hasMany,
+              ['alias']: (relation.alias === undefined )?relation.attribute:relation.alias,
+
+          }
+      })
     }
   }
+
 
   // Getter para saber si se puede seleccionar un objeto de la lista de objetos
   isSelectable() {

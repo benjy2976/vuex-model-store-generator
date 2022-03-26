@@ -13,11 +13,15 @@ export default class StoreDefault {
       itemSelected: Object.assign({ loading: false }, model.getDefault()),
       items: [],
       key: config.key,
+      moduleAlias: config.moduleAlias,
+      maxRelationsResolve: config.maxRelationsResolve,
       relations: config.relations
     }
     this.getters = {
       // Getter para obtener el indice de la tabla
       key: (state) => { return state.key },
+      // Getter para obtener el indice de la tabla
+      default: () => { return model.getDefault() },
       // Getter para obtener el nombre del objeto seleccionado
       name: (state) => (id) => {
         let c = [...state.items]
@@ -31,11 +35,11 @@ export default class StoreDefault {
       },
 
       // Getter para obtener el objeto seleccionado
-      find: (state, getters) => (id) => {
+      find: (state, getters) => (id, level=1) => {
         let c = [...state.items]
         c = c.find(d => d[state.key] === id)
         if (c !== undefined) {
-          return getters.resolve(c)
+          return getters.resolve(c, level)
         } else {
           return model.getDefault()
         }
@@ -47,8 +51,8 @@ export default class StoreDefault {
       },
 
       // Getter para obtener la lista de objetos filtrados
-      filter: (state, getters) => (filter) => {
-        return state.items.filter(filter).map(item => getters.resolve(item))
+      filter: (state, getters) => (filter, level=1) => {
+        return state.items.filter(filter).map(item => getters.resolve(item, level))
       },
 
       // Getter para obtener el objeto seleccionado
@@ -56,8 +60,8 @@ export default class StoreDefault {
         return getters.resolve(state.itemSelected)
       },
       // Getter para resolver las relaciones
-      resolve: (state, _, __, rootGetters) => (item) => {
-        return resolveRelations(item, state, rootGetters)
+      resolve: (state, _, __, rootGetters) => (item, level=1) => {
+        return resolveRelations(item, state, rootGetters, level)
       }
     }
 
