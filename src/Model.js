@@ -1,10 +1,10 @@
 import { md5 } from 'pure-md5'
 import StoreDefault from "./StoreDefault"
 import axios from 'axios'
-
 export default class Model {
 
-  constructor(config) {
+  constructor(config, instance=null) {
+    this.instance= instance==null?axios.create():instance//axios instance
     let defaultValues = {
       alias: null,// Alias utilizado para almacenar en el localstorage
       route: null,// Ruta donde se encuentra el resource
@@ -46,7 +46,7 @@ export default class Model {
   get(url = '', params = {}) {
     params = Object.assign(params, this.params)
     url = this.route + '/' + url
-    return axios.get(url, {
+    return this.instance.get(url, {
       params: params,
     })
   }
@@ -54,13 +54,13 @@ export default class Model {
   post(url = '', params = {}) {
     params = Object.assign(params, this.params)
     url = this.route + '/' + url
-    return axios.post(url, params)
+    return this.instance.post(url, params)
   }
 
   // Función para obtener el listado de Objetos de la base de datos
   getAll(params = {}) {
     params = Object.assign(params, this.params)
-    return axios.get(this.route, {
+    return this.instance.get(this.route, {
       params: params,
     })
   }
@@ -68,12 +68,12 @@ export default class Model {
   // Función para crear un objeto en la base de datos
   create(d) {
     d = Object.assign(d, this.params)
-    return axios.post(this.route, d)
+    return this.instance.post(this.route, d)
   }
 
   // Función para mostrar un objeto de la base de datos
   show(id) {
-    return axios.get(this.route + '/' + id, {
+    return this.instance.get(this.route + '/' + id, {
       params: this.params,
     })
   }
@@ -81,12 +81,12 @@ export default class Model {
   // Función para actualizar un objeto en la base de datos
   update(d) {
     d = Object.assign(d, this.params)
-    return axios.put(this.route + '/' + d[this.key], d)
+    return this.instance.put(this.route + '/' + d[this.key], d)
   }
 
   // Función para eliminar un objeto de la base de datos
   delete(d) {
-    return axios.delete(this.route + '/' + d[this.key], {
+    return this.instance.delete(this.route + '/' + d[this.key], {
       params: this.params,
     })
   }
