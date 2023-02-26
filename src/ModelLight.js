@@ -8,6 +8,7 @@ export default class Model {
       alias     : null,// Alias utilizado para almacenar en el localstorage
       route     : null,// Ruta donde se encuentra el resource
       hash      : false,// La condicional si se va a validar el md5
+      sync: false,// La condicional si se va sincronizar o reemplazar el state al hacer un nuevo request
       store     : false,// La condicional que define si se guardara en el localstorage
       methods   : null, // Define los métodos adicionales utilizados por el modelo
       /*config for storeDefault*/
@@ -23,6 +24,7 @@ export default class Model {
     this.alias        = defaultValues.alias
     this.route        = defaultValues.route
     this.hash         = defaultValues.hash
+    this.sync         = defaultValues.sync
     this.store        = defaultValues.store
     for (const prop in defaultValues.methods) {
       this[prop] = defaultValues.methods[prop]
@@ -156,7 +158,8 @@ export default class Model {
               ['alias']: (relation.alias === undefined )?relation.attribute:relation.alias,
 
           }
-      })
+      }),
+      sync: this.sync
     }
   }
 

@@ -15,7 +15,8 @@ export default class StoreDefault {
       key: config.key,
       moduleAlias: config.moduleAlias,
       maxRelationsResolve: config.maxRelationsResolve,
-      relations: config.relations
+      relations: config.relations,
+      syncStatus: config.sync
     }
     this.getters = {
       // Getter para obtener el indice de la tabla
@@ -61,19 +62,24 @@ export default class StoreDefault {
       },
       // Getter para resolver las relaciones
       resolve: (state, _, __, rootGetters) => (item, level=1) => {
+        item = Object.assign(model.getDefault(), item)
         return resolveRelations(item, state, rootGetters, level)
       }
     }
 
     this.actions = {
       // Action para obtener la lista de objetos de el servidor
-      get: ({ dispatch }, params = {}) => {
+      get: ({ state, dispatch }, params = {}) => {
         //var commit = store.commit
         if (!model.saved()) {
           return new Promise((resolve, reject) => {
             model.getAll(params).then(response => {
               model.save(response.data)
-              dispatch('sync', response.data)
+              if(state.syncStatus){
+                dispatch('sync', response.data)
+              }else{
+                dispatch('setItems', response.data)
+              }
               dispatch('afterGet')
               resolve(response)
             }).catch(error => {
@@ -127,6 +133,19 @@ export default class StoreDefault {
         })
       },
       /*
+      ***** action para setear objetos (items)  en el store ***
+      */
+      setItems: ({ commit, dispatch, rootGetters }, items) => {
+        let a = { items, dispatch, rootGetters }
+        commit('SET_ITEMS', a)
+      },
+      /*
+      ***** action para setear el syncStatus ***
+      */
+      setSyncStatus: ({ commit }, syncStatus) => {
+        commit('SET_SYNC_STATUS', syncStatus)
+      },
+      /*
       ***** action para determinar si se actualizara un objeto o varios de acuerdo al formato de llegada de la data ***
       */
       sync: ({ state, commit, dispatch }, data) => {
@@ -149,6 +168,8 @@ export default class StoreDefault {
       ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
       */
       syncItem: ({ state, commit, getters, dispatch, rootGetters }, item) => {
+        console.log(item)
+        console.log(model.getDefault())
         if (getters.find(item.id).id !== null && getters.find(item.id).id !== undefined) {
           commit('UPDATE', exportRelations(item, state, dispatch, rootGetters))
         } else {
@@ -158,20 +179,26 @@ export default class StoreDefault {
     }
     this.mutations = {
       // Mutation para setear el listado de objetos
-      SET_ITEMS: (state, data) => {
-        state.items = data
+      SET_ITEMS: (state, { items, dispatch, rootGetters }) => {
+        items=items.map(item=>exportRelations(item, state, dispatch, rootGetters))
+        state.items = items
+      },
+      // Mutation para setear el syncStatus
+      SET_SYNC_STATUS: (state, syncStatus) => {
+        state.syncStatus = syncStatus
       },
       // Mutation para setear el listado de objetos
-      SYNC_ITEMS: (state, { items, dispatch, rootGetters }) => {
-        for (let index in items) {
-          let i = state.items.findIndex(d => d[state.key] === items[index][state.key])
+      SYNC_ITEMS: (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
+        items=items.map(item=>exportRelations(item, state, dispatch, rootGetters))
+        items.forEach(function(item) {
+          let i = state.items.findIndex(d => d[state.key] === item[state.key])
           if (i === -1) {
-            state.items.push(exportRelations(items[index], state, dispatch, rootGetters))
+            state.items.push(item)
           } else {
-            state.items[i] = Object.assign(state.items[i], exportRelations(items[index], state, dispatch, rootGetters))
+            state.items[i] = Object.assign(state.items[i], item)
             //Vue.set(state.items, i, exportRelations(items[index], state, dispatch, rootGetters))
           }
-        }
+        });
       },
 
       // Mutation para agregar un objeto a la lista de objetos
