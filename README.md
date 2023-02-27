@@ -35,6 +35,7 @@ export default {
     /*config for storeDefault*/
     key       : 'id',//define el primary key que se usara para acceder al objeto
     name      : 'name',//nombre del atributo name en la base de datos
+    maxRelationsResolve: 1//la cantidad de veces que resolvera la relacion default 1
     relations : [// Relaciones con otros models
         {
             attribute: 'category_id',
@@ -155,7 +156,7 @@ const actions = {
     syncItem(item)//action to synchronize an object (item) with an object stored in the store
     //at the state.items list
     //*** estas acciones seleccionan un elemento de la lista de elementos y ponen el valor en un estado. ***
-    selectItem(item)//this actions select one item from the list of items and put the value into a state.item
+    selectItem(id)//this actions select one item from the list of items and put the value into a state.item
     //*** esta acción se llama después de que se envía el artículo seleccionado, puede redefinirlo si lo necesita ***
     afterSelect()//this action is called after the selectItem is dispatched, you yo can redefine it if you need
     //*** esta accion de seleccioan el itemSelected ***

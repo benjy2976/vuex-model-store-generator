@@ -25,10 +25,9 @@ export function resolveRelations(data, state, rootGetters, level=1) {
                     })
                 }
                 else{
-                    console.log('Max relation resolve exceded ' +JSON.stringify(state))
                     return ({
                         ...prev,
-                        ['errorResolve']: 'Max relation resolve exceded '+JSON.stringify(state)
+                        ['errorResolve']: 'Max relation resolve exceded: resolved '+level+' times'
                     })
                 }
 

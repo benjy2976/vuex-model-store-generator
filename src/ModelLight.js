@@ -14,7 +14,7 @@ export default class Model {
       /*config for storeDefault*/
       key       : 'id',// Define el primary key que se usara para acceder al objeto
       name      : 'name',// Nombre del atributo name en la base de datos
-      maxRelationsResolve: 3,// Relaciones con otros models
+      maxRelationsResolve: 1,// Relaciones con otros models
       relations : [],// Relaciones con otros models
       selectable: false,// Condicional para definir si el objeto es seleccionable
       default   : {},// Valor del objeto por defecto,
