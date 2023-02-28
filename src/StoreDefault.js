@@ -16,7 +16,8 @@ export default class StoreDefault {
       moduleAlias: config.moduleAlias,
       maxRelationsResolve: config.maxRelationsResolve,
       relations: config.relations,
-      syncStatus: config.sync
+      syncStatus: config.sync,
+      selectedStatus: false
     }
     this.getters = {
       // Getter para obtener el indice de la tabla
@@ -36,7 +37,7 @@ export default class StoreDefault {
       },
 
       // Getter para obtener el objeto seleccionado
-      find: (state, getters) => (id, level=1) => {
+      find: (state, getters) => (id, level = 1) => {
         let c = [...state.items]
         c = c.find(d => d[state.key] === id)
         if (c !== undefined) {
@@ -52,16 +53,19 @@ export default class StoreDefault {
       },
 
       // Getter para obtener la lista de objetos filtrados
-      filter: (state, getters) => (filter, level=1) => {
+      filter: (state, getters) => (filter, level = 1) => {
         return state.items.filter(filter).map(item => getters.resolve(item, level))
       },
 
-      // Getter para obtener el objeto seleccionado
+      // Getter para obtener el objeto seleccionado o falso si no hay seleccion
       selected: (state, getters) => {
-        return getters.resolve(state.itemSelected)
+        if (state.selectedStatus)
+          return getters.resolve(state.itemSelected)
+        else
+          return state.selectedStatus
       },
       // Getter para resolver las relaciones
-      resolve: (state, _, __, rootGetters) => (item, level=1) => {
+      resolve: (state, _, __, rootGetters) => (item, level = 1) => {
         item = Object.assign(model.getDefault(), item)
         return resolveRelations(item, state, rootGetters, level)
       }
@@ -75,9 +79,9 @@ export default class StoreDefault {
           return new Promise((resolve, reject) => {
             model.getAll(params).then(response => {
               model.save(response.data)
-              if(state.syncStatus){
+              if (state.syncStatus) {
                 dispatch('sync', response.data)
-              }else{
+              } else {
                 dispatch('setItems', response.data)
               }
               dispatch('afterGet')
@@ -110,7 +114,7 @@ export default class StoreDefault {
       },
 
       // Action para actualizar un objeto en la base de datos y en la lista de objetos
-      update: ({ state,dispatch, rootGetters }, data) => {
+      update: ({ state, dispatch, rootGetters }, data) => {
         return new Promise((resolve, reject) => {
           model.update(data).then(response => {
             dispatch('syncItem', exportRelations(response.data, state, dispatch, rootGetters))
@@ -180,7 +184,7 @@ export default class StoreDefault {
     this.mutations = {
       // Mutation para setear el listado de objetos
       SET_ITEMS: (state, { items, dispatch, rootGetters }) => {
-        items=items.map(item=>exportRelations(item, state, dispatch, rootGetters))
+        items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
         state.items = items
       },
       // Mutation para setear el syncStatus
@@ -189,8 +193,8 @@ export default class StoreDefault {
       },
       // Mutation para setear el listado de objetos
       SYNC_ITEMS: (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
-        items=items.map(item=>exportRelations(item, state, dispatch, rootGetters))
-        items.forEach(function(item) {
+        items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
+        items.forEach(function (item) {
           let i = state.items.findIndex(d => d[state.key] === item[state.key])
           if (i === -1) {
             state.items.push(item)
@@ -229,7 +233,6 @@ export default class StoreDefault {
             commit('SET_SELECTED', Object.assign(model.getDefault(), { loading: true }))
             let d = state.items.filter(d => parseInt(d[state.key]) === parseInt(id))
             if (d.length === 1) {
-              d[0].loaded = true
               commit('SET_SELECTED', Object.assign(d[0], { loading: false }))
               dispatch('afterSelect')
               resolve({
@@ -266,12 +269,14 @@ export default class StoreDefault {
 
       // Mutation para seleccionar un Objeto
       this.mutations['SET_SELECTED'] = (state, data) => {
+        Vue.set(state, 'selectedStatus', true)
         Vue.set(state, 'itemSelected', data)
         //state.itemSelected = Object.assign(model.getDefault(), data)
       }
 
       // Mutation para seleccionar un Objeto
       this.mutations['CLEAR_SELECTED'] = (state) => {
+        Vue.set(state, 'selectedStatus', false)
         state.itemSelected = model.getDefault()
       }
     }
