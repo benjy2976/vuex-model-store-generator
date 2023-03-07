@@ -3,14 +3,14 @@ import Vue from 'vue'
 
 export default class StoreDefault {
   constructor(model, state = {}, getters = {}, actions = {}, mutations = {}) {
-    let defData = {
+    const defData = {
       key: 'id',
     }
-    let config = Object.assign(defData, model.getStoreConfig())
+    const config = Object.assign(defData, model.getStoreConfig())
 
     this.namespaced = true
     this.state = {
-      itemSelected: Object.assign({ loading: false }, model.getDefault()),
+      itemSelected: { loading: false, ...model.getDefault() },
       items: [],
       key: config.key,
       moduleAlias: config.moduleAlias,
@@ -25,49 +25,34 @@ export default class StoreDefault {
       // Getter para obtener el indice de la tabla
       default: () => { return model.getDefault() },
       // Getter para obtener el nombre del objeto seleccionado
-      name: (state) => (id) => {
-        let c = [...state.items]
-        c = c.find(d => d[state.key] === id)
-        if (c !== undefined) {
-          return c[model.getNameAttribute()]
-        } else {
-          return null
-        }
-
+      name: ({ items, key }) => (id) => {
+        const item = items.find(d => d[key] === id)
+        return item ? `${item[model.getNameAttribute()]}` : null
       },
 
       // Getter para obtener el objeto seleccionado
-      find: (state, getters) => (id, level = 1) => {
-        let c = [...state.items]
-        c = c.find(d => d[state.key] === id)
-        if (c !== undefined) {
-          return getters.resolve(c, level)
-        } else {
-          return model.getDefault()
-        }
+      find: ({ items, key }, getters) => (id, level = 1) => {
+        const item = items.find(d => d[key] === id)
+        return item ? getters.resolve(item, level):model.getDefault()
       },
 
       // Getter para obtener la lista de objetos
-      list: (state, getters) => {
-        return state.items.map(item => getters.resolve(item))
+      list: ({items}, { resolve }) => {
+        return items.map(resolve)
       },
-
       // Getter para obtener la lista de objetos filtrados
-      filter: (state, getters) => (filter, level = 1) => {
-        return state.items.filter(filter).map(item => getters.resolve(item, level))
+      filter: ({items}, {resolve}) => (filter, level = 1) => {
+        return items.filter(filter).map(item => resolve(item, level))
       },
 
       // Getter para obtener el objeto seleccionado o falso si no hay seleccion
-      selected: (state, getters) => {
-        if (state.selectedStatus)
-          return getters.resolve(state.itemSelected)
-        else
-          return state.selectedStatus
+      selected: ({ itemSelected, selectedStatus }, { resolve }) => {
+        return selectedStatus ? resolve(itemSelected) : selectedStatus
       },
       // Getter para resolver las relaciones
-      resolve: (state, _, __, rootGetters) => (item, level = 1) => {
+      resolve: ({ maxRelationsResolve, key, relations }, _, __, rootGetters) => (item, level = 1) => {
         item = Object.assign(model.getDefault(), item)
-        return resolveRelations(item, state, rootGetters, level)
+        return resolveRelations(item, { maxRelationsResolve, key, relations }, rootGetters, level)
       }
     }
 
@@ -78,21 +63,16 @@ export default class StoreDefault {
         if (!model.saved()) {
           return new Promise((resolve, reject) => {
             model.getAll(params).then(response => {
-              model.save(response.data)
-              if (state.syncStatus) {
-                dispatch('sync', response.data)
-              } else {
-                dispatch('setItems', response.data)
-              }
-              dispatch('afterGet')
-              resolve(response)
-            }).catch(error => {
-              reject(error)
-            })
+                model.save(response.data);
+                const action = state.syncStatus ? 'sync' : 'setItems';
+                dispatch(action, response.data);
+                dispatch('afterGet');
+                resolve(response);
+              }).catch(reject);
           })
         } else {
-          dispatch('sync', model.getFromLocalStorage())
-          dispatch('afterGet')
+          dispatch('sync', model.getFromLocalStorage());
+          dispatch('afterGet');
         }
       },
 
@@ -172,8 +152,6 @@ export default class StoreDefault {
       ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
       */
       syncItem: ({ state, commit, getters, dispatch, rootGetters }, item) => {
-        console.log(item)
-        console.log(model.getDefault())
         if (getters.find(item.id).id !== null && getters.find(item.id).id !== undefined) {
           commit('UPDATE', exportRelations(item, state, dispatch, rootGetters))
         } else {
