@@ -93,11 +93,17 @@ const state = {
     //here you can redefine or define new states
     //by default its going to create the next stores
     /
-    key:"id",
-    itemSelected:Object,
+    itemSelected:{},
     items:Array[],
-    relations:Array[],
-    syncStatus: boolean //here you define whether sync() or setItems() will be used
+    keysAsinc: [],
+    keysTemp: [],
+    key: config.key,
+    moduleAlias: config.moduleAlias,
+    maxRelationsResolve: config.maxRelationsResolve,
+    relations: config.relations,
+    syncStatus: config.sync,//here you define whether sync() or setItems() will be used
+    selectedStatus: false,
+    timeOutAsinc:null
 
      
     //you do not need to define it, it is going to create automatically 
@@ -131,7 +137,10 @@ const getters = {
 const actions = {
     //here you can redefine or define new actions
     //by default its going to create the next actions
-    
+    /* esta accion almacena todos los keys que con los que se le invoca en un periodo de 100ms para realizar una peticion al servicor con los datos de todas esas keys */
+    checkAsinc ({ state, getters, dispatch, commit }, key )//this action stores all the keys with which it is invoked in a period of 100ms to make a request to the service with the data of all those keys
+    /* esta accion invoca a  show del modelo y almacena la respuesta */
+    show ({ dispatch })//this action invoque at the show fron the model and store the response into the state.items
     //*** esta acción invoca getAll(params) del modelo y almacena la respuesta en state.items. ***
     get(params)//this action invoque at the getAll(params) from the model and store the response into a state.items 
     //*** esta acción se invoca después de que se envía el get, puede redefinirlo si lo necesita ***
@@ -169,7 +178,11 @@ const actions = {
 const mutations = {
 //here you can redefine or define new mutations
 //by default its going to create the next mutations
-
+ADD_KEYS_ASINC (state, keys)
+SET_KEYS_ASINC (state, keys)
+ADD_KEYS_TEMP (state, key)
+SET_KEYS_TEMP (state, keys)
+SET_TIMEOUT(state, fTime)
 SET_ITEMS({ items, dispatch, rootGetters })
 SET_SYNC_STATUS(syncStatus)
 // Mutation para setear el listado de objetos

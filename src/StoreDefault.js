@@ -12,12 +12,15 @@ export default class StoreDefault {
     this.state = {
       itemSelected: { loading: false, ...model.getDefault() },
       items: [],
+      keysAsinc: [],
+      keysTemp: [],
       key: config.key,
       moduleAlias: config.moduleAlias,
       maxRelationsResolve: config.maxRelationsResolve,
       relations: config.relations,
       syncStatus: config.sync,
-      selectedStatus: false
+      selectedStatus: false,
+      timeOutAsinc:null
     }
     this.getters = {
       // Getter para obtener el indice de la tabla
@@ -57,6 +60,42 @@ export default class StoreDefault {
     }
 
     this.actions = {
+      
+      checkAsinc: ({ state, getters, dispatch, commit }, key ) => {
+        const item = getters.find(key)
+        if(item[state.key]==null){
+          if(!state.keysAsinc.find(d=>d==key)&&!state.keysTemp.find(d=>d==key)){
+            commit('ADD_KEYS_TEMP', key)
+          }
+          if(state.timeOutAsinc == null){
+            commit('SET_TIMEOUT', () => {
+              let keys=[]
+              keys=keys.concat(state.keysAsinc)
+              commit('ADD_KEYS_ASINC', state.keysAsinc)
+              commit('SET_KEYS_TEMP', [])
+              if(state.keysAsinc.length==1){
+                dispatch('show', keys)
+              }else{
+                let params={}
+                params[state.key]=['IN'].concat(keys)
+                dispatch('get', params)
+              }
+            })
+          }
+          state.push
+        } 
+        return item
+      },
+      // Action para obtener un registro por el (key) del servicor
+      show: ({ dispatch }, id) => {
+        //var commit = store.commit
+          return new Promise((resolve, reject) => {
+            model.show(id).then(response => {
+                dispatch('syncItem', response.data)
+                resolve(response);
+              }).catch(reject);
+          })
+      },
       // Action para obtener la lista de objetos de el servidor
       get: ({ state, dispatch }, params = {}) => {
         //var commit = store.commit
@@ -160,6 +199,29 @@ export default class StoreDefault {
       },
     }
     this.mutations = {
+      // 
+      ADD_KEYS_ASINC: (state, keys) => {
+        if (Array.isArray(keys)) { 
+          state.keysAsinc = state.keysAsinc.concat(keys)
+        } else {
+          state.keysAsinc.push(keys)
+        }
+      },
+      // 
+      SET_KEYS_ASINC: (state, keys) => {
+        state.keysAsinc=keys
+      },
+      // 
+      ADD_KEYS_TEMP: (state, key) => {
+        state.keysAsinc.push(key)
+      },
+      // 
+      SET_KEYS_TEMP: (state, keys) => {
+        state.keysTemp=keys
+      },
+      SET_TIMEOUT:(state, fTime)=>{
+        state.timeOutAsinc = setTimeout(fTime, 100)
+      },
       // Mutation para setear el listado de objetos
       SET_ITEMS: (state, { items, dispatch, rootGetters }) => {
         items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
@@ -218,8 +280,7 @@ export default class StoreDefault {
                 data: d[0]
               })
             } else {
-              model.show(id).then(response => {
-                dispatch('syncItem', response.data)
+              dispatch('show',id).then(response => {
                 commit('SET_SELECTED', Object.assign(response.data, { loading: false }))
                 dispatch('afterSelect')
                 resolve(response)
