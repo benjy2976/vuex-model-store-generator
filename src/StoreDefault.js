@@ -70,8 +70,8 @@ export default class StoreDefault {
           if(state.timeOutAsinc == null){
             commit('SET_TIMEOUT', () => {
               let keys=[]
-              keys=keys.concat(state.keysAsinc)
-              commit('ADD_KEYS_ASINC', state.keysAsinc)
+              keys=keys.concat(state.keysTemp)
+              commit('ADD_KEYS_ASINC', state.keysTemp)
               commit('SET_KEYS_TEMP', [])
               if(state.keysAsinc.length==1){
                 dispatch('show', keys)
@@ -213,7 +213,7 @@ export default class StoreDefault {
       },
       // 
       ADD_KEYS_TEMP: (state, key) => {
-        state.keysAsinc.push(key)
+        state.keysTemp.push(key)
       },
       // 
       SET_KEYS_TEMP: (state, keys) => {
@@ -222,27 +222,37 @@ export default class StoreDefault {
       SET_TIMEOUT:(state, fTime)=>{
         state.timeOutAsinc = setTimeout(fTime, 100)
       },
-      // Mutation para setear el listado de objetos
-      SET_ITEMS: (state, { items, dispatch, rootGetters }) => {
-        items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
-        state.items = items
-      },
       // Mutation para setear el syncStatus
       SET_SYNC_STATUS: (state, syncStatus) => {
         state.syncStatus = syncStatus
       },
       // Mutation para setear el listado de objetos
+      SET_ITEMS: (state, { items, dispatch, rootGetters }) => {
+        items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
+        state.items = items
+      },
+       
+      ADD_ITEMS: (state, items) => {
+        if (Array.isArray(items)) { 
+          state.items = state.items.concat(items)
+        } else {
+          state.items.push(items)
+        }
+      },
+      // Mutation para setear el listado de objetos
       SYNC_ITEMS: (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
         items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
-        items.forEach(function (item) {
+        let insert = items
+        items.forEach( (item,index) =>{
           let i = state.items.findIndex(d => d[state.key] === item[state.key])
-          if (i === -1) {
-            state.items.push(item)
-          } else {
+          if (i !== -1) {
             state.items[i] = Object.assign(state.items[i], item)
+            insert.splice(index, 1)
             //Vue.set(state.items, i, exportRelations(items[index], state, dispatch, rootGetters))
           }
+
         });
+        state.items = state.items.concat(insert)
       },
 
       // Mutation para agregar un objeto a la lista de objetos
