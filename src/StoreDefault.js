@@ -80,6 +80,7 @@ export default class StoreDefault {
                 params[state.key]=['IN'].concat(keys)
                 dispatch('get', params)
               }
+              commit('CLEAR_TIMEOUT')
             })
           }
           state.push
@@ -221,6 +222,9 @@ export default class StoreDefault {
       },
       SET_TIMEOUT:(state, fTime)=>{
         state.timeOutAsinc = setTimeout(fTime, 100)
+      },
+      CLEAR_TIMEOUT:(state)=>{
+        state.timeOutAsinc = null
       },
       // Mutation para setear el syncStatus
       SET_SYNC_STATUS: (state, syncStatus) => {
