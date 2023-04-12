@@ -81,7 +81,7 @@ export default class StoreDefault {
           if (Array.isArray(key)) {
             let keys=key
             key.forEach((d,i)=>{
-              if(state.items.findIndex(d1=>(d1[state.key]==d)!=-1)||(state.keysAsinc.find(d1=>d1==d))||(state.keysTemp.find(d1=>d1==d)))
+              if((state.items.findIndex(d1=>(d1[state.key]==d))!=-1)||(state.keysAsinc.indexOf(d)!=-1)||(state.keysTemp.indexOf(d)!=-1))
               {
                 keys.splice(i,1)
               }
