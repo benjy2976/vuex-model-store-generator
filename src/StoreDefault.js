@@ -104,7 +104,7 @@ export default class StoreDefault {
                 commit('SET_TIMEOUT', ftime)
               }
             } 
-            resolve( item)
+            resolve(item)
           }
         })
       },
