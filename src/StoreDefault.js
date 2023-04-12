@@ -234,8 +234,12 @@ export default class StoreDefault {
         state.keysAsinc=keys
       },
       // 
-      ADD_KEYS_TEMP : (state, key) => {
+      ADD_KEY_TEMP : (state, key) => {
         state.keysTemp.push(key)
+      },
+      // 
+      ADD_KEYS_TEMP : (state, keys) => {
+        state.keysTemp=state.keysTemp.concat(keys)
       },
       // 
       SET_KEYS_TEMP : (state, keys) => {
