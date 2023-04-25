@@ -213,7 +213,7 @@ export default class StoreDefault {
       ***** action para sincronizar un objeto (item) con un objeto almacenado en el store ***
       */
       syncItem : ({ state, commit, getters, dispatch, rootGetters }, item) => {
-        if (getters.find(item.id).id !== null && getters.find(item.id).id !== undefined) {
+        if (getters.find(item[state.key])[state.key] !== null && getters.find(item[state.key])[state.key] !== undefined) {
           commit('UPDATE', exportRelations(item, state, dispatch, rootGetters))
         } else {
           commit('CREATE', exportRelations(item, state, dispatch, rootGetters))
@@ -305,15 +305,20 @@ export default class StoreDefault {
       }
     }
 
-
-    if (model.isSelectable()) {
-      // Action para seleccionar un objeto * busca en la lista de objetos y si no lo encuentra hace un request
-      this.actions['selectItem'] = ({ state, commit, dispatch }, id) => {
+    const actionSelectable={
+      selectItem : ({ state, commit, dispatch }, val) => {
+        let parameters={
+          id           : val,
+          forceRequest : false
+        }
+        if (val instanceof Object){
+          parameters=Object.assign(parameters, val)
+        }
         return new Promise((resolve, reject) => {
-          if (state.itemSelected[state.key] !== parseInt(id)) {
+          if (state.itemSelected[state.key] !== parseInt(parameters.id)) {
             commit('SET_SELECTED', Object.assign(model.getDefault(), { loading: true }))
-            let d = state.items.filter(d => parseInt(d[state.key]) === parseInt(id))
-            if (d.length === 1) {
+            let d = state.items.filter(d => parseInt(d[state.key]) === parseInt(parameters.id))
+            if (d.length === 1 && !parameters.forceRequest) {
               commit('SET_SELECTED', Object.assign(d[0], { loading: false }))
               dispatch('afterSelect')
               resolve({
@@ -321,7 +326,7 @@ export default class StoreDefault {
                 data   : d[0]
               })
             } else {
-              dispatch('show',id).then(response => {
+              dispatch('show',parameters.id).then(response => {
                 commit('SET_SELECTED', Object.assign(response.data, { loading: false }))
                 dispatch('afterSelect')
                 resolve(response)
@@ -336,29 +341,34 @@ export default class StoreDefault {
             })
           }
         })
-      }
-
+      },
+    
       // Action que se ejecuta después de seleccionar un Objeto
-      this.actions['afterSelect'] = () => {
+      afterSelect : () => {
         //
-      }
-
-      this.actions['deselect'] = ({ commit }) => {
+      },
+    
+      deselect : ({ commit }) => {
         commit('CLEAR_SELECTED')
       }
-
+    }
+    const mutationsSelectable={
       // Mutation para seleccionar un Objeto
-      this.mutations['SET_SELECTED'] = (state, data) => {
+      SET_SELECTED : (state, data) => {
         Vue.set(state, 'selectedStatus', true)
         Vue.set(state, 'itemSelected', data)
         //state.itemSelected = Object.assign(model.getDefault(), data)
-      }
+      },
 
       // Mutation para seleccionar un Objeto
-      this.mutations['CLEAR_SELECTED'] = (state) => {
+      CLEAR_SELECTED : (state) => {
         Vue.set(state, 'selectedStatus', false)
         state.itemSelected = model.getDefault()
       }
+    }
+    if (model.isSelectable()) {
+      this.actions=Object.assign(this.actions, actionSelectable)
+      this.mutations=Object.assign(this.mutations, mutationsSelectable)
     }
     this.state = Object.assign(this.state, state)
     this.getters = Object.assign(this.getters, getters)
