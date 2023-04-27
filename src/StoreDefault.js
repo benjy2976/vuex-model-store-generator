@@ -69,13 +69,9 @@ export default class StoreDefault {
             keys=keys.concat(state.keysTemp)
             commit('ADD_KEYS_ASINC', state.keysTemp)
             commit('SET_KEYS_TEMP', [])
-            if(state.keysAsinc.length==1){
-              dispatch('show', keys)
-            }else{
-              let params={}
-              params[state.key]=['IN'].concat(keys)
-              dispatch('get', params)
-            }
+            let params={}
+            params[state.key]=['IN'].concat(keys)
+            dispatch('get', params)
             commit('CLEAR_TIMEOUT')
           }
           if (Array.isArray(key)) {
