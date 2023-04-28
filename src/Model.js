@@ -196,7 +196,12 @@ export default class Model {
   // Getter para obtener el valor por default de el objeto
   getDefault() {
     //return JSON.parse(JSON.stringify(this.default))
-    return Object.assign(this.modelGetters,this.default)
+    //return {...Object.assign({},this.default),...this.getModelGetters()}
+    return Object.assign({},this.default)
+  }
+  // Getter para obtener el valor por default de el objeto modelGetters
+  getModelGetters() {
+    return Object.assign({},this.modelGetters)
   }
 
   // Getter para obtener el nombre del atributo que hace referencia al nombre del Objeto
