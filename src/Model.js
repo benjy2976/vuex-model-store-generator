@@ -19,7 +19,8 @@ export default class Model {
       relations           : [],// Relaciones con otros models
       selectable          : false,// Condicional para definir si el objeto es seleccionable
       default             : {},// Valor del objeto por defecto,
-      params              : { modeljs: true }// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
+      params              : { modeljs: true },// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
+      modelGetters        : {  }// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
     }
     defaultValues = Object.assign(defaultValues, config)
     this.alias = defaultValues.alias
@@ -39,6 +40,7 @@ export default class Model {
     this.selectable = defaultValues.selectable
     this.default = defaultValues.default
     this.params = defaultValues.params
+    this.modelGetters = defaultValues.modelGetters
     this.state = {}
     this.getters = {}
     this.actions = {}
@@ -193,7 +195,8 @@ export default class Model {
 
   // Getter para obtener el valor por default de el objeto
   getDefault() {
-    return JSON.parse(JSON.stringify(this.default))
+    //return JSON.parse(JSON.stringify(this.default))
+    return Object.assign(this.modelGetters,this.default)
   }
 
   // Getter para obtener el nombre del atributo que hace referencia al nombre del Objeto
