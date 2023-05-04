@@ -9,7 +9,7 @@ export default class StoreDefault {
     const config = Object.assign(defData, model.getStoreConfig())
 
     this.namespaced = true
-    this.state = {
+    this.state = ()=>({
       itemSelected        : { loading: false, ...model.getDefault() },
       items               : [],
       keysAsinc           : [],
@@ -20,8 +20,9 @@ export default class StoreDefault {
       relations           : config.relations,
       syncStatus          : config.sync,
       selectedStatus      : false,
-      timeOutAsinc        : null
-    }
+      timeOutAsinc        : null,
+      ...state
+    })
     this.getters = {
       // Getter para obtener el indice de la tabla
       key     : (state) => { return state.key },
@@ -366,7 +367,6 @@ export default class StoreDefault {
       this.actions=Object.assign(this.actions, actionSelectable)
       this.mutations=Object.assign(this.mutations, mutationsSelectable)
     }
-    this.state = Object.assign(this.state, state)
     this.getters = Object.assign(this.getters, getters)
     this.actions = Object.assign(this.actions, actions)
     this.mutations = Object.assign(this.mutations, mutations)
