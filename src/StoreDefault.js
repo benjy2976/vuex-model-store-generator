@@ -303,7 +303,7 @@ export default class StoreDefault {
     }
 
     const actionSelectable={
-      selectItem : ({ state, commit, dispatch }, val) => {
+      selectItem : ({ state, commit, dispatch, rootGetters }, val) => {
         let parameters={
           id           : val,
           forceRequest : false
@@ -324,7 +324,7 @@ export default class StoreDefault {
               })
             } else {
               dispatch('show',parameters.id).then(response => {
-                commit('SET_SELECTED', Object.assign(response.data, { loading: false }))
+                commit('SET_SELECTED', Object.assign(exportRelations(response.data, state, dispatch, rootGetters), { loading: false }))
                 dispatch('afterSelect')
                 resolve(response)
               }).catch(error => {
