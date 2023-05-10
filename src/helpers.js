@@ -43,13 +43,59 @@ export function resolveRelations(data, state, rootGetters, level=1) {
 function relationLinck(data, alias, relation, key, rootGetters, level) {
   if (relation.hasMany === false) {
     return Array.isArray(data[relation.alias]) ?
-      data[relation.alias].map(x => rootGetters[`${relation.module}/find`](x, level)) :
-      rootGetters[`${relation.module}/find`](data[relation.attribute], level)
+      data[relation.alias].map(x => {return {...rootGetters[`${relation.module}/find`](x, level),pivot_id: x}}) :
+      {...rootGetters[`${relation.module}/find`](data[relation.attribute], level),pivot_id: data[relation.attribute]}
   } else {
     return rootGetters[`${relation.module}/filter`](d => d[relation.attribute] === data[key], level)
   }
 }
 
+export function globalExportRelations(items, state, dispatch, rootGetters) {
+
+  let relations=state.relations.map(d=>{return {...d,pivot: []}})
+  if(state.relations.length==0){
+    return items
+  }
+  items=items.map(data => {
+    if(data.pivot!==undefined){
+      delete data.pivot
+    }
+    return {
+      ...data,
+      ...relations.reduce(
+        (prev, relation, currentIndex) => {
+          let attr = data[relation.alias]
+          if (attr !== undefined) {
+            if(Array.isArray(attr)){
+              prev[relation.alias]= attr.map(obj => obj[rootGetters[`${relation.module}/key`]])
+              relations[currentIndex].pivot = relations[currentIndex].pivot.concat(attr)
+            }
+            else{
+              delete prev[relation.attribute]
+              relations[currentIndex].pivot.push(attr)
+            }
+            return ({
+              ...prev
+            })
+          }
+          else {
+            return { ...prev }
+          }
+        }, {}
+      )
+    };
+  })
+  
+  relations.forEach( (relation) =>{
+    console.log(relations)
+    if(relation.pivot.length>0){
+      console.log(`se tienen ${relation.pivot.length} registros para sincronizar ${relation.module}/sync`)
+      dispatch(`${relation.module}/sync`, relation.pivot, { root: true })
+    }
+  })
+  return items
+
+}
 export function exportRelations(data, state, dispatch, rootGetters) {
   if(data.pivot!==undefined){
     delete data.pivot
@@ -81,7 +127,7 @@ export function exportRelations(data, state, dispatch, rootGetters) {
         }, {}
       )
     };
-    /* for (const index in state.relations) {
+  /* for (const index in state.relations) {
         let relation = state.relations[index]
         let attr = data[relation.attribute]
         if (attr !== undefined && Array.isArray(attr) && attr.length > 0 && typeof attr[0] === 'object') {

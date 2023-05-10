@@ -1,4 +1,4 @@
-import { resolveRelations, exportRelations } from "./helpers"
+import { resolveRelations, exportRelations, globalExportRelations } from "./helpers"
 import Vue from 'vue'
 
 export default class StoreDefault {
@@ -37,7 +37,7 @@ export default class StoreDefault {
       // Getter para obtener el objeto seleccionado
       find : ({ items, key }, getters) => (id, level = 1) => {
         const item = items.find(d => d[key] === id)
-        return item ? getters.resolve(item, level):{...model.getDefault(),[key]: id}
+        return item ? getters.resolve(item, level):model.getDefault()
       },
 
       // Getter para obtener la lista de objetos
@@ -193,7 +193,7 @@ export default class StoreDefault {
       sync : ({ dispatch }, data) => {
         if (typeof data === 'object' && data !== null) {
           if (Array.isArray(data)) {
-            dispatch('syncItems', data)
+              dispatch('syncItems', data)
           } else {
             dispatch('syncItem', data)
           }
@@ -255,7 +255,8 @@ export default class StoreDefault {
       // Mutation para setear el listado de objetos
       SET_ITEMS : (state, { items, dispatch, rootGetters }) => {
         if(state.relations.length>0){
-          items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
+          //items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
+          items = globalExportRelations(items, state, dispatch, rootGetters)
         }
         state.items = items
       },
