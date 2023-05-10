@@ -37,7 +37,7 @@ export default class StoreDefault {
       // Getter para obtener el objeto seleccionado
       find : ({ items, key }, getters) => (id, level = 1) => {
         const item = items.find(d => d[key] === id)
-        return item ? getters.resolve(item, level):model.getDefault()
+        return item ? getters.resolve(item, level):{...model.getDefault(),[key]: id}
       },
 
       // Getter para obtener la lista de objetos
