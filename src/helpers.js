@@ -56,15 +56,15 @@ export function globalExportRelations(items, state, dispatch, rootGetters) {
   if(state.relations.length==0){
     return items
   }
-  items=items.map(data => {
-    if(data.pivot!==undefined){
-      delete data.pivot
+  items=items.map(item => {
+    if(item.pivot!==undefined){
+      delete item.pivot
     }
     return {
-      ...data,
+      ...item,
       ...relations.reduce(
         (prev, relation, currentIndex) => {
-          let attr = data[relation.alias]
+          let attr = item[relation.alias]
           if (attr !== undefined) {
             if(Array.isArray(attr)){
               prev[relation.alias]= attr.map(obj => obj[rootGetters[`${relation.module}/key`]])
@@ -85,16 +85,12 @@ export function globalExportRelations(items, state, dispatch, rootGetters) {
       )
     };
   })
-  
   relations.forEach( (relation) =>{
-    console.log(relations)
     if(relation.pivot.length>0){
-      console.log(`se tienen ${relation.pivot.length} registros para sincronizar ${relation.module}/sync`)
       dispatch(`${relation.module}/sync`, relation.pivot, { root: true })
     }
   })
   return items
-
 }
 export function exportRelations(data, state, dispatch, rootGetters) {
   if(data.pivot!==undefined){
@@ -116,7 +112,6 @@ export function exportRelations(data, state, dispatch, rootGetters) {
               delete prev[relation.attribute]
             }
             dispatch(`${relation.module}/sync`, attr, { root: true })
-
             return ({
               ...prev
             })
@@ -127,20 +122,4 @@ export function exportRelations(data, state, dispatch, rootGetters) {
         }, {}
       )
     };
-  /* for (const index in state.relations) {
-        let relation = state.relations[index]
-        let attr = data[relation.attribute]
-        if (attr !== undefined && Array.isArray(attr) && attr.length > 0 && typeof attr[0] === 'object') {
-            dispatch(`${relation.module}/syncItems`, attr, {root: true})
-            data[relation.attribute] = data[relation.attribute].map(obj => obj[rootGetters[`${relation.module}/key`]])
-        }
-    } */
-  /* state.relations.forEach(relation => {
-        let attr = data[relation.attribute]
-        if (attr !== undefined && Array.isArray(attr) && attr.length > 0 && typeof attr[0] === 'object') {
-            dispatch(`${relation.module}/syncItems`, attr, { root: true })
-            data[relation.attribute] = data[relation.attribute].map(obj => obj[rootGetters[`${relation.module}/key`]])
-        }
-    });
-    return data */
 }

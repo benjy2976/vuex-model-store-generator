@@ -193,7 +193,7 @@ export default class StoreDefault {
       sync : ({ dispatch }, data) => {
         if (typeof data === 'object' && data !== null) {
           if (Array.isArray(data)) {
-              dispatch('syncItems', data)
+            dispatch('syncItems', data)
           } else {
             dispatch('syncItem', data)
           }
@@ -325,7 +325,8 @@ export default class StoreDefault {
               })
             } else {
               dispatch('show',parameters.id).then(response => {
-                commit('SET_SELECTED', Object.assign(exportRelations(response.data, state, dispatch, rootGetters), { loading: false }))
+                let d = state.items.filter(d => parseInt(d[state.key]) === parseInt(parameters.id))
+                commit('SET_SELECTED', Object.assign(d[0], { loading: false }))
                 dispatch('afterSelect')
                 resolve(response)
               }).catch(error => {
