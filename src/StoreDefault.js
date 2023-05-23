@@ -271,16 +271,17 @@ export default class StoreDefault {
       // Mutation para setear el listado de objetos
       SYNC_ITEMS : (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
         items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
-        let insert = items
-        items.forEach( (item,index) =>{
+        let insert = items.reduce( (accumulator, item) =>{
           let i = state.items.findIndex(d => d[state.key] === item[state.key])
-          if (i !== -1) {
-            state.items[i] = Object.assign(state.items[i], item)
-            insert.splice(index, 1)
-            //Vue.set(state.items, i, exportRelations(items[index], state, dispatch, rootGetters))
+          if (i > -1) {
+            //state.items[i] = Object.assign(state.items[i], item)
+            Vue.set(state.items, i, exportRelations(item, state, dispatch, rootGetters))
+          }else{
+            accumulator.push(item)
           }
+          return accumulator
 
-        });
+        },[]);
         state.items = state.items.concat(insert)
       },
 

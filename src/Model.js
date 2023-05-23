@@ -97,10 +97,13 @@ export default class Model {
 
   // Función para verificar si la lista esta guardada en el local storage
   saved() {
-    if (this.hash) {
-      this.verificarHash()
-    }
-    return !!localStorage.getItem(this.alias)
+    if(this.store){
+      if (this.hash) {
+        this.verificarHash()
+      }
+      return !!localStorage.getItem(this.alias)
+    }else
+      return this.store
   }
 
   // Función para almacenar la lista en el localstorage
