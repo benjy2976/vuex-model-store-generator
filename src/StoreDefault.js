@@ -42,7 +42,7 @@ export default class StoreDefault {
 
       // Getter para obtener la lista de objetos
       list : ({items}, { resolve }) => {
-        return items.map(resolve)
+        return items.map(item => resolve(item))
       },
       // Getter para obtener la lista de objetos filtrados
       filter : ({items}, {resolve}) => (filter, level = 1) => {
