@@ -79,11 +79,12 @@ export default class Model {
   show(params) {
     let id=null
     let d = this.params
-    if(Number.isInteger(params)){
-      id=params
-    }else{
+    // eslint-disable-next-line no-constant-condition
+    if(typeof params === 'object'){
       id=params.id
       d = Object.assign(params.params, this.params)
+    }else{
+      id=params
     }
     return this.instance.get(this.route + '/' + id, {
       params : d,
