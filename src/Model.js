@@ -76,9 +76,17 @@ export default class Model {
   }
 
   // Función para mostrar un objeto de la base de datos
-  show(id) {
+  show(params) {
+    let id=null
+    let d = this.params
+    if(Number.isInteger(params)){
+      id=params
+    }else{
+      id=params.id
+      d = Object.assign(params.params, this.params)
+    }
     return this.instance.get(this.route + '/' + id, {
-      params : this.params,
+      params : d,
     })
   }
 
