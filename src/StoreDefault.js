@@ -199,6 +199,14 @@ export default class StoreDefault {
           }
         }
       },
+      
+      addToRelation : ({ state, commit }, {relation, id, relations}) => {
+        console.log(state.relations)
+        console.log(relations)
+        if (state.relations.some(r=>r.alias==relation)) { 
+          commit('ADD_TO_RELATION', {relation, id, relations})
+        } 
+      },
       /*
       ***** action para sincronizar objetos (items) con los objetos almacenado en el store ***
       */
@@ -261,6 +269,15 @@ export default class StoreDefault {
         state.items = items
       },
        
+      ADD_TO_RELATION : (state, {relation, id, relations}) => {
+        let index = state.items.findIndex(d => d[state.key] === id)
+        if(Array.isArray(relations)){
+          state.items[index][relation] = state.items[index][relation].cocat(relations)
+        }else{
+          state.items[index][relation].push(relations) 
+        }
+      },
+
       ADD_ITEMS : (state, items) => {
         if (Array.isArray(items)) { 
           state.items = state.items.concat(items)
