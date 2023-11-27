@@ -140,10 +140,10 @@ export default class StoreDefault {
       },
 
       // Action para crear un objeto en la base de datos y en la lista de objetos
-      create : ({ state, dispatch, rootGetters }, data) => {
+      create : ({ dispatch }, data) => {
         return new Promise((resolve, reject) => {
           model.create(data).then(response => {
-            dispatch('syncItem', exportRelations(response.data, state, dispatch, rootGetters))
+            dispatch('syncItem', response.data)
             resolve(response)
           }).catch(error => {
             reject(error)
@@ -152,10 +152,10 @@ export default class StoreDefault {
       },
 
       // Action para actualizar un objeto en la base de datos y en la lista de objetos
-      update : ({ state, dispatch, rootGetters }, data) => {
+      update : ({ dispatch }, data) => {
         return new Promise((resolve, reject) => {
           model.update(data).then(response => {
-            dispatch('syncItem', exportRelations(response.data, state, dispatch, rootGetters))
+            dispatch('syncItem', response.data)
             resolve(response)
           }).catch(error => {
             reject(error)
@@ -201,8 +201,6 @@ export default class StoreDefault {
       },
       
       addToRelation : ({ state, commit }, {relation, id, relations}) => {
-        console.log(state.relations)
-        console.log(relations)
         if (state.relations.some(r=>r.alias==relation)) { 
           commit('ADD_TO_RELATION', {relation, id, relations})
         } 
@@ -287,12 +285,12 @@ export default class StoreDefault {
       },
       // Mutation para setear el listado de objetos
       SYNC_ITEMS : (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
-        items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
+        items = globalExportRelations(items, state, dispatch, rootGetters)
         let insert = items.reduce( (accumulator, item) =>{
           let i = state.items.findIndex(d => d[state.key] === item[state.key])
           if (i > -1) {
             //state.items[i] = Object.assign(state.items[i], item)
-            Vue.set(state.items, i, exportRelations(item, state, dispatch, rootGetters))
+            Vue.set(state.items, i, item)
           }else{
             accumulator.push(item)
           }
@@ -322,7 +320,7 @@ export default class StoreDefault {
     }
 
     const actionSelectable={
-      selectItem : ({ state, commit, dispatch, rootGetters }, val) => {
+      selectItem : ({ state, commit, dispatch }, val) => {
         let parameters={
           id           : val,
           forceRequest : false

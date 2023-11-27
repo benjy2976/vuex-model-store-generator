@@ -50,6 +50,7 @@ function relationLinck(data, alias, relation, key, rootGetters, level) {
   }
 }
 
+//esta funcion se usa para exportar las relaciones de un arreglo de objetos
 export function globalExportRelations(items, state, dispatch, rootGetters) {
 
   let relations=state.relations.map(d=>{return {...d,pivot: []}})
@@ -92,6 +93,8 @@ export function globalExportRelations(items, state, dispatch, rootGetters) {
   })
   return items
 }
+
+//esta funcion se usa para exportar las relaciones de un objeto
 export function exportRelations(data, state, dispatch, rootGetters) {
   if(data.pivot!==undefined){
     delete data.pivot
