@@ -66,7 +66,7 @@ export function globalExportRelations(items, state, dispatch, rootGetters) {
       ...relations.reduce(
         (prev, relation, currentIndex) => {
           let attr = item[relation.alias]
-          if (attr !== undefined) {
+          if (attr !== undefined&&attr !== null) {
             if(Array.isArray(attr)){
               prev[relation.alias]= attr.map(obj => obj[rootGetters[`${relation.module}/key`]])
               relations[currentIndex].pivot = relations[currentIndex].pivot.concat(attr)
@@ -107,7 +107,7 @@ export function exportRelations(data, state, dispatch, rootGetters) {
       ...state.relations.reduce(
         (prev, relation) => {
           let attr = data[relation.alias]
-          if (attr !== undefined) {
+          if (attr !== undefined&&attr !== null) {
             if(Array.isArray(attr)){
               prev[relation.alias]= attr.map(obj => obj[rootGetters[`${relation.module}/key`]])
             }
