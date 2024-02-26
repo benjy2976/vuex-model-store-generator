@@ -1,4 +1,4 @@
-import { md5 } from 'pure-md5'
+import { md5 } from 'js-md5'
 import StoreDefault from "./StoreDefault"
 import axios from 'axios'
 export default class Model {
