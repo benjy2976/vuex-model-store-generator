@@ -72,7 +72,7 @@ export default class StoreDefault {
             commit('SET_KEYS_TEMP', [])
             let params={}
             params[state.key]=['IN'].concat(keys)
-            dispatch('get', params)
+            dispatch('getSome', params)
             commit('CLEAR_TIMEOUT')
           }
           if (Array.isArray(key)) {
@@ -118,22 +118,33 @@ export default class StoreDefault {
       // Action para obtener la lista de objetos de el servidor
       get : ({ state, dispatch }, params = {}) => {
         //var commit = store.commit
+        const action = state.syncStatus ? 'sync' : 'setItems';
         if (!model.saved()) {
           return new Promise((resolve, reject) => {
             model.getAll(params).then(response => {
               model.save(response.data);
-              const action = state.syncStatus ? 'sync' : 'setItems';
               dispatch(action, response.data);
               dispatch('afterGet');
               resolve(response);
             }).catch(reject);
           })
         } else {
-          dispatch('sync', model.getFromLocalStorage());
+          dispatch(action, model.getFromLocalStorage());
           dispatch('afterGet');
         }
       },
 
+      // Action para obtener la lista de algunos objetos de el servidor
+      getSome : ({ dispatch }, params = {}) => {
+        //var commit = store.commit
+        return new Promise((resolve, reject) => {
+          model.getAll(params).then(response => {
+            dispatch('sync', response.data);
+            dispatch('afterGet');
+            resolve(response);
+          }).catch(reject);
+        })
+      },
       // Action que se ejecuta después de obtener la lista de objetos
       afterGet : () => {
         //
