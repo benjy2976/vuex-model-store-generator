@@ -126,3 +126,22 @@ export function exportRelations(data, state, dispatch, rootGetters) {
       )
     };
 }
+
+
+export function areObjEquals (foo, bar) {
+  let equal = true;
+
+  for (let [key, val] of Object.entries(foo)) {
+    if (bar.hasOwnProperty(key))   {
+      if (bar[key] !== val) {
+        equal = false;
+      }
+    } else {
+      equal = false;
+    }
+
+    if (!equal) { break; }
+  }
+
+  return equal;
+}

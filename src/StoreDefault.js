@@ -1,4 +1,4 @@
-import { resolveRelations, exportRelations, globalExportRelations } from "./helpers"
+import { resolveRelations, exportRelations, globalExportRelations, areObjEquals } from "./helpers"
 import Vue from 'vue'
 
 export default class StoreDefault {
@@ -7,7 +7,22 @@ export default class StoreDefault {
       key : 'id',
     }
     const config = Object.assign(defData, model.getStoreConfig())
-
+    let check =(d,data)=>{return d[config.key] === data[config.keyey]}
+    if ( config.hasKey){
+      if(Array.isArray(config.key)){
+        check=(d,data)=>{
+          let status = true
+          config.key.forEach(function(key) {
+            status = status&&d[key] === data[key]
+          });
+          return status
+        }
+      }
+    }else{
+      check=(d,data)=>{
+        return areObjEquals(d,data)
+      }
+    }
     this.namespaced = true
     this.state = ()=>({
       itemSelected        : { loading: false, ...model.getDefault() },
@@ -21,6 +36,7 @@ export default class StoreDefault {
       syncStatus          : config.sync,
       selectedStatus      : false,
       timeOutAsinc        : null,
+      check               : check,
       ...state
     })
     this.getters = {
@@ -296,9 +312,10 @@ export default class StoreDefault {
       },
       // Mutation para setear el listado de objetos
       SYNC_ITEMS : (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
+        items=items.filter((data, index, array)=>array.findIndex(d=>state.check(d,data)) === index)
         items = globalExportRelations(items, state, dispatch, rootGetters)
         let insert = items.reduce( (accumulator, item) =>{
-          let i = state.items.findIndex(d => d[state.key] === item[state.key])
+          let i = state.items.findIndex(d=>state.check(d,item))
           if (i > -1) {
             //state.items[i] = Object.assign(state.items[i], item)
             Vue.set(state.items, i, item)
@@ -318,14 +335,14 @@ export default class StoreDefault {
 
       // Mutation para actualizar un objeto de la lista de objetos
       UPDATE : (state, data) => {
-        let index = state.items.findIndex(d => d[state.key] === data[state.key])
+        let index = state.items.findIndex(d => state.check(d,data))
         state.items[index] = Object.assign(state.items[index], data)
         //Vue.set(state.items, index, data)
       },
 
       // Mutation para actualizar un objeto de la lista de objetos
       DELETE : (state, data) => {
-        let index = state.items.findIndex(d => d[state.key] === data[state.key])
+        let index = state.items.findIndex(d => state.check(d,data))
         state.items.splice(index, 1)
       }
     }

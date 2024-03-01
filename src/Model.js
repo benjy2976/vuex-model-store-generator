@@ -13,6 +13,7 @@ export default class Model {
       store               : false,// La condicional que define si se guardara en el localstorage
       methods             : null, // Define los métodos adicionales utilizados por el modelo
       /*config for storeDefault*/
+      hasKey              : false,// Define si la tabla tiene primaryKey
       key                 : 'id',// Define el primary key que se usara para acceder al objeto
       name                : 'name',// Nombre del atributo name en la base de datos
       maxRelationsResolve : 1,// Relaciones con otros models
@@ -22,6 +23,7 @@ export default class Model {
       params              : { modeljs: true },// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
       modelGetters        : {  }// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
     }
+    config.hasKey=config.hasKey!=undefined?config.hasKey:config.key
     defaultValues = Object.assign(defaultValues, config)
     this.alias = defaultValues.alias
     this.route = defaultValues.route
