@@ -19,6 +19,7 @@ export default class StoreDefault {
         }
       }
     }else{
+      console.warn(`El modulo ${config.moduleAlias} no tiene Keys, esto reducira el rendimiento` )
       check=(d,data)=>{
         return areObjEquals(d,data)
       }

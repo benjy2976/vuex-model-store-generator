@@ -154,6 +154,7 @@ export default class Model {
   getStoreConfig() {
     return {
       key                 : this.key,
+      hasKey              : this.hasKey,
       moduleAlias         : this.alias,
       maxRelationsResolve : this.maxRelationsResolve,
       relations           : this.relations.map(relation => {
