@@ -7,7 +7,7 @@ export default class StoreDefault {
       key : 'id',
     }
     const config = Object.assign(defData, model.getStoreConfig())
-    let check =(d,data)=>{return d[config.key] === data[config.keyey]}
+    let check =(d,data)=>{return d[config.key] === data[config.key]}
     if ( config.hasKey){
       if(Array.isArray(config.key)){
         check=(d,data)=>{
