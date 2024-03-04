@@ -21,7 +21,7 @@ export default class Model {
       default             : {},// Valor del objeto por defecto,
       params              : {modeljs: true}// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
     }
-    config.hasKey=config.hasKey!=undefined?config.hasKey:config.key!=undefined
+    //config.hasKey=config.hasKey!=undefined?config.hasKey:config.key!=undefined
     defaultValues     = Object.assign(defaultValues, config)
     this.alias        = defaultValues.alias
     this.route        = defaultValues.route
