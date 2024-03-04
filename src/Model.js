@@ -23,7 +23,7 @@ export default class Model {
       params              : { modeljs: true },// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
       modelGetters        : {  }// Aquí se configuran parámetros adicionales a enviar en los request excepto DELETE
     }
-    config.hasKey=config.hasKey!=undefined?config.hasKey:config.key
+    config.hasKey=config.hasKey!=undefined?config.hasKey:config.key!=undefined
     defaultValues = Object.assign(defaultValues, config)
     this.alias = defaultValues.alias
     this.route = defaultValues.route
@@ -36,6 +36,7 @@ export default class Model {
     this.singular = defaultValues.singular
     this.plural = defaultValues.plural
     this.key = defaultValues.key
+    this.hasKey = defaultValues.hasKey
     this.name = defaultValues.name
     this.maxRelationsResolve = defaultValues.maxRelationsResolve
     this.relations = defaultValues.relations
