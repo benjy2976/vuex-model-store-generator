@@ -71,7 +71,7 @@ export function globalExportRelations(items, state, dispatch, rootGetters) {
               prev[relation.alias]= attr.map(obj => obj[rootGetters[`${relation.module}/key`]])
               relations[currentIndex].pivot = relations[currentIndex].pivot.concat(attr)
             }
-            else{
+            else if (typeof attr == 'object' || attr instanceof Object){
               delete prev[relation.attribute]
               relations[currentIndex].pivot.push(attr)
             }
@@ -110,11 +110,12 @@ export function exportRelations(data, state, dispatch, rootGetters) {
           if (attr !== undefined&&attr !== null) {
             if(Array.isArray(attr)){
               prev[relation.alias]= attr.map(obj => obj[rootGetters[`${relation.module}/key`]])
+              dispatch(`${relation.module}/syncItems`, attr, { root: true })
             }
-            else{
+            else if (typeof attr == 'object' || attr instanceof Object){
               delete prev[relation.attribute]
+              dispatch(`${relation.module}/syncItem`, attr, { root: true })
             }
-            dispatch(`${relation.module}/sync`, attr, { root: true })
             return ({
               ...prev
             })
