@@ -10,13 +10,10 @@ export default class StoreDefault {
     let check =(d,data)=>{return d[config.key] === data[config.key]}
     if ( config.hasKey){
       if(Array.isArray(config.key)){
-        check=(d,data)=>{
-          let status = true
-          config.key.forEach(function(key) {
-            status = status&&d[key] === data[key]
-          });
-          return status
-        }
+        let check_str = config.key.reduce((a, key)=>a+` d['${key}'] === data['${key}'] &&`,'(d,data)=>{return')
+        check_str = check_str.substring(0, check_str.length-2)
+        check_str+='}'
+        check = eval(check_str)
       }
     }else{
       console.warn(`El modulo ${config.moduleAlias} no tiene Keys, esto reducira el rendimiento` )
@@ -313,19 +310,19 @@ export default class StoreDefault {
       },
       // Mutation para setear el listado de objetos
       SYNC_ITEMS : (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
+        //este filter elimina los valores duplicados
         items=items.filter((data, index, array)=>array.findIndex(d=>state.check(d,data)) === index)
         items = globalExportRelations(items, state, dispatch, rootGetters)
-        let insert = items.reduce( (accumulator, item) =>{
+        let insert = items.filter( (item) =>{
           let i = state.items.findIndex(d=>state.check(d,item))
           if (i > -1) {
-            //state.items[i] = Object.assign(state.items[i], item)
-            Vue.set(state.items, i, item)
+            state.items[i] = Object.assign(state.items[i], item)
+            //Vue.set(state.items, i, item)
+            return false
           }else{
-            accumulator.push(item)
+            return true
           }
-          return accumulator
-
-        },[]);
+        });
         state.items = state.items.concat(insert)
       },
 
