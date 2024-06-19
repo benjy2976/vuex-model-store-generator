@@ -84,8 +84,8 @@ export default class Model {
     let d = this.params
     // eslint-disable-next-line no-constant-condition
     if(typeof params === 'object'){
-      id=params.id
-      d = Object.assign(params.params, this.params)
+      id=params[this.key]
+      d = Object.assign(params, this.params)
     }else{
       id=params
     }

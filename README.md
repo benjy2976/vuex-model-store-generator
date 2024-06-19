@@ -22,7 +22,7 @@ $ npm install vuex-model-store-generator
 NOTE: if you use a md5 validation and the store functionality you can download the resource from the server once,
 an re download only if the data was changed.
 
-you can create a core/producto.js file and put the next code
+you can create a core/product.js file and put the next code
 
 ```js
 export default {
@@ -38,16 +38,16 @@ export default {
     maxRelationsResolve: 1//la cantidad de veces que resolvera la relacion default 1
     relations : [// Relaciones con otros models
         {
-            attribute: 'category_id',
-            alias: 'category',//si no se define se asume le mismo nombre que attribute
-            module: 'categories',
+            attribute: 'brand_id',
+            alias: 'brand',//si no se define se asume le mismo nombre que attribute
+            module: 'brands',
             hasMany: false// si no se define se asumen como falso
-        }
+        },
     ],
     selectable: false,//condicional para definir si el objeto es seleccionable
     default   : {
         id:null,
-        category_id:null,
+        brand_id:null,
         name:null
     },//valor del objeto por defecto,
     params    : {modeljs: true}//aquí se configuran parámetros adicionales a enviar en los request
@@ -56,16 +56,48 @@ export default {
 
 ```
 
+you can create a core/category.js file and put the next code
+
+```js
+export default {
+    alias     : 'brand' ,//alias utilizado para almacenar en el localstorage
+    route     : '/api/auth/brand',//ruta donde se encuentra el resource
+    hash      : false,//la condicional si se va a validar el md5
+    store     : false,//la condicional que define si se guardara en el localstorage
+    methods   : null, //define los métodos adicionales utilizados por el modelo
+
+    /*config for storeDefault*/
+    key       : 'id',//define el primary key que se usara para acceder al objeto
+    name      : 'name',//nombre del atributo name en la base de datos
+    maxRelationsResolve: 1//la cantidad de veces que resolvera la relacion default 1
+    relations : [// Relaciones con otros models
+        {
+          attribute : 'brand_id',
+          alias     : 'products',
+          module    : 'products',
+          hasMany   : true//se pone false para que busque a traves del pivot
+        },
+    ],
+    selectable: false,//condicional para definir si el objeto es seleccionable
+    default   : {
+        id:null,
+        name:null
+    },//valor del objeto por defecto,
+    params    : {modeljs: true}//aquí se configuran parámetros adicionales a enviar en los request
+   
+}
+
+```
 create core/index.js
 
 ```js
 import Model from 'vuex-model-store-generator'
 import axios from '../../plugins/client'
 
-import configProducto from './producto'
-import configCategorie from './producto'
-export const Producto = new Model(configProducto, axios)
-export const Categorie = new Model(configCategorie, axios)
+import configProduct from './product'
+import configBrand from './brand'
+export const Producto = new Model(configProduct, axios)
+export const Brand = new Model(configBrand, axios)
 
 ```
 
@@ -86,7 +118,7 @@ crating the next structure
 ```
 into /store/modules you can create a products.js file
 ```js
-import {Product} from '../../models'
+//import {Product} from '../../models' //import if necessary
 
 
 const state = {
@@ -194,25 +226,30 @@ SET_SELECTED(item)
 CLEAR_SELECTED()
 
 }
+export default {
+  state,
+  getters,
+  actions,
+  mutations
+}
 
-export default Product.getStore(state, getters, actions, mutations)
 
 ```
 you need to create a file index.js into a /store folder you have two ways to declare the state
 
 ````js
-import Vue        from 'vue'
-import Vuex       from 'vuex'
-import product    from './modules/product'
-import {Categorie} from "../core"
+import Vue              from 'vue'
+import Vuex             from 'vuex'
+import stateProduct     from './modules/product'
+import {Product, Brand} from "../core"
 
 Vue.use(Vuex)
 const debug = process.env.NODE_ENV !== 'production'
 
 export default new Vuex.Store({
                                 modules: {
-                                  product,
-                                  categories: Categorie.getStore(),
+                                  products: Product.setStore(stateProduct).getStore(),
+                                  brands: Brand.getStore(),
                                 },
                                 strict : debug,
                               })

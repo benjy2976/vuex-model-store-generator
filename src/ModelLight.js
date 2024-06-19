@@ -71,9 +71,18 @@ export default class Model {
   }
 
   // Función para mostrar un objeto de la base de datos
-  show(id) {
+  show(params) {
+    let id=null
+    let d = this.params
+    // eslint-disable-next-line no-constant-condition
+    if(typeof params === 'object'){
+      id=params[this.key]
+      d = Object.assign(params, this.params)
+    }else{
+      id=params
+    }
     return this.instance.get(this.route + '/' + id, {
-      params : this.params,
+      params : d,
     })
   }
 
