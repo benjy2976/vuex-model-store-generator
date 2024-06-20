@@ -295,7 +295,7 @@ export default class StoreDefault {
       },
       // Mutation para setear el listado de objetos
       SET_ITEMS : (state, { items, dispatch, rootGetters }) => {
-        if(state.relations.length>0){
+        if(state.relations.length>0&&items.length>0){
           let relations = state.relations
           relations = relations.filter(relation=>{
             items[0][relation.alias]!=undefined
@@ -325,11 +325,13 @@ export default class StoreDefault {
       SYNC_ITEMS : (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
         //este filter elimina los valores duplicados
         items=items.filter((data, index, array)=>array.findIndex(d=>state.check(d,data)) === index)
-        let relations = state.relations
-        relations = relations.filter(relation=>{
-          items[0][relation.alias]!=undefined
-        })
-        items = globalExportRelations(items, relations, dispatch, rootGetters)
+        if(state.relations.length>0&&items.length>0){
+          let relations = state.relations
+          relations = relations.filter(relation=>{
+            items[0][relation.alias]!=undefined
+          })
+          items = globalExportRelations(items, relations, dispatch, rootGetters)
+        }
         let insert = items.filter( (item) =>{
           let i = state.items.findIndex(d=>state.check(d,item))
           if (i > -1) {
