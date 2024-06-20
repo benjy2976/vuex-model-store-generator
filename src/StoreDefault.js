@@ -148,12 +148,24 @@ export default class StoreDefault {
         }
       },
 
-      // Action para obtener la lista de algunos objetos de el servidor
+      // Action para obtener la lista de algunos objetos de el servidor sin consultar ni almacenar en el localstorage
       getSome : ({ dispatch }, params = {}) => {
         //var commit = store.commit
         return new Promise((resolve, reject) => {
           model.getAll(params).then(response => {
             dispatch('sync', response.data);
+            dispatch('afterGet');
+            resolve(response);
+          }).catch(reject);
+        })
+      },
+      // Action para limpiar el state y  obtener la lista de algunos objetos de el servidor
+      clearAndGet : ({ dispatch }, params = {}) => {
+        //var commit = store.commit
+        dispatch('setItems', []);
+        return new Promise((resolve, reject) => {
+          model.getAll(params).then(response => {
+            dispatch('setItems', response.data);
             dispatch('afterGet');
             resolve(response);
           }).catch(reject);
