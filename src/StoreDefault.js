@@ -161,8 +161,6 @@ export default class StoreDefault {
       },
       // Action para limpiar el state y  obtener la lista de algunos objetos de el servidor
       clearAndGet : ({ dispatch }, params = {}) => {
-        //var commit = store.commit
-        dispatch('setItems', []);
         return new Promise((resolve, reject) => {
           model.getAll(params).then(response => {
             dispatch('setItems', response.data);
@@ -298,8 +296,11 @@ export default class StoreDefault {
       // Mutation para setear el listado de objetos
       SET_ITEMS : (state, { items, dispatch, rootGetters }) => {
         if(state.relations.length>0){
-          //items = items.map(item => exportRelations(item, state, dispatch, rootGetters))
-          items = globalExportRelations(items, state, dispatch, rootGetters)
+          let relations = state.relations
+          relations = relations.filter(relation=>{
+            items[0][relation.alias]!=undefined
+          })
+          items = globalExportRelations(items, relations, dispatch, rootGetters)
         }
         state.items = items
       },
@@ -324,7 +325,11 @@ export default class StoreDefault {
       SYNC_ITEMS : (state, { items, dispatch, rootGetters }) => {/////esto hace lenta la carga
         //este filter elimina los valores duplicados
         items=items.filter((data, index, array)=>array.findIndex(d=>state.check(d,data)) === index)
-        items = globalExportRelations(items, state, dispatch, rootGetters)
+        let relations = state.relations
+        relations = relations.filter(relation=>{
+          items[0][relation.alias]!=undefined
+        })
+        items = globalExportRelations(items, relations, dispatch, rootGetters)
         let insert = items.filter( (item) =>{
           let i = state.items.findIndex(d=>state.check(d,item))
           if (i > -1) {
