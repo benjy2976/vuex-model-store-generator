@@ -298,7 +298,8 @@ export default class StoreDefault {
         if(state.relations.length>0&&items.length>0){
           let relations = state.relations
           relations = relations.filter(relation=>{
-            items[0][relation.alias]!=undefined
+            let alias = relation.alias != undefined ? relation.alias : relation.attribute
+            return items[0][alias]!=undefined
           })
           items = globalExportRelations(items, relations, dispatch, rootGetters)
         }
@@ -328,7 +329,8 @@ export default class StoreDefault {
         if(state.relations.length>0&&items.length>0){
           let relations = state.relations
           relations = relations.filter(relation=>{
-            items[0][relation.alias]!=undefined
+            let alias = relation.alias != undefined ? relation.alias : relation.attribute
+            return items[0][alias]!=undefined
           })
           items = globalExportRelations(items, relations, dispatch, rootGetters)
         }
