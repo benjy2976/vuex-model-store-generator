@@ -162,6 +162,9 @@ export default class StoreDefault {
       // Action para limpiar el state y  obtener la lista de algunos objetos de el servidor
       clearAndGet : ({ dispatch }, params = {}) => {
         return new Promise((resolve, reject) => {
+          //  se agrega esta linea "dispatch('setItems', [])" para que al momento de cargar los nuevos datos la reactividad sea mas veloz
+          // divide y vencceras
+          dispatch('setItems', []);
           model.getAll(params).then(response => {
             dispatch('setItems', response.data);
             dispatch('afterGet');
